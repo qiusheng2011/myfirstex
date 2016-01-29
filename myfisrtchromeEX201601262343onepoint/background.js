@@ -73,7 +73,7 @@ chrome.runtime.onMessage.addListener(
                     // 表单
 
 
-                    formdata.append("url",url);
+                   // formdata.append("url",url);
                     formdata.append("body",body);
                     //oReq.setRequestHeader("Content-Length", formdata.length);
                     oReq.send(formdata);
@@ -91,6 +91,7 @@ chrome.runtime.onMessage.addListener(
                         if (oReq.responseText.indexOf("true") > 0) {
                             alert("大王,您已经巡山成功!");
                              sendUploadState(true,url);
+                            notification.show();
 
                         }
                         else {
@@ -143,7 +144,7 @@ chrome.runtime.onMessage.addListener(
 
                         }
 
-                        console.log("图片数据" + data);
+                        //console.log("图片数据" + data);
 
                     };
 
@@ -211,7 +212,24 @@ function post(URL, PARAMS) {
 }
 
 
-
+//创建 菜单方法
+//createRightMenu();
+//
+//function createRightMenu()
+//{
+//    chrome.contextMenus.create({"title":"add '%s' to category","contexts":["selection"],"onclick":clickSelfMenu(),"documentUrlPatterns":['http://*/*','https://*/*']});
+//
+//}
+//
+////菜单触发方法
+//
+//function  clickSelfMenu()
+//{
+//
+//    alert("恭喜");
+//
+//
+//}
 
 function  sendUploadState(state,urlm)
 {
@@ -225,7 +243,7 @@ function  sendUploadState(state,urlm)
         stateStr="false";
     }
 chrome.tabs.query({url:urlm},function(tabs){
-    console.log(tabs);
+  //  console.log(tabs);
     for(var i=0;i<tabs.length;i++)
     {
         chrome.tabs.sendMessage(tabs[i].id,{uploadstate:stateStr},function (response) {
@@ -237,7 +255,17 @@ chrome.tabs.query({url:urlm},function(tabs){
 
 });
 
+   // chrome.tabs.getCurrent(function(tab))
+
 
 
 
 }
+
+// 通知
+//
+//var notification = webkitNotifications.createNotification(
+//    'apple.png',  // icon url - can be relative
+//    '上传成功',  // notification title
+//    '222222666666666666'  // notification body text
+//);
