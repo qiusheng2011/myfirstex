@@ -1,0 +1,28 @@
+{
+	"manifest_version":2,
+   "name":"AVARSHA_PRODUCT_CAPTURE_TOOL",
+    "version":"0.1",
+    "description":"获取产品页的信息,第0.1版 使用过程中有任何问题和好的建议,欢迎提出,不好的地方,请及时赐教,感激不尽! ",
+     "icons":{"16":"apple.png","128":"apple.png"},
+     "background":{
+          "script":"background.js",
+         "page":"background.html"
+     	},
+     "permissions":[
+     	"https://*/*",
+       "http://*/*",
+     	"background",
+     	"tabs",
+     	"bookmarks",
+       "contextMenus"
+     ],
+  "optional_permissions": [ "tabs", "http://*/*","http://*/*","tabs","webRequest"],
+     "browser_action":{
+        "default_title":"gaoxxuzhao",
+        "default_icon":"apple.png",
+        "default_popup":"popup.html",
+        "default_js":"popup.js"
+     },
+     "content_scripts":[{"matches":["http://*/*","https://*/*"],"js":["content_script.js"]}]
+
+}
