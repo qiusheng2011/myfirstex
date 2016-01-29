@@ -12,7 +12,6 @@ var   allimgJsonArray={};
 
 
 
-
 var dataArray=new Array( new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
 var dataName=new Array("website","catagory","productname","price","descript","images");
 for(var i=0;i<dataArray.length;i++ )
@@ -425,12 +424,16 @@ function  submitContent(id)
         }
         else
         {
-            if(i==4)
+            if(i==3)
             {
-               // fromList[i].value=document.getElementById("swdestextarea").value;
+                if(fromList[i].name=="price"&&(fromList[i].value.indexOf("$")<0))
+                {
+                    fromList[i].value="$"+fromList[i].value;
+
+                }
             }
 
-               dataArray[i][0]=fromList[i].getAttribute("name");
+              dataArray[i][0]=fromList[i].getAttribute("name");
               dataArray[i][1]=String(fromList[i].value);
               dataArray[i][2]=fromList[i].getAttribute("xpath");
 
@@ -439,7 +442,7 @@ function  submitContent(id)
         }
     }
       dataArray[4][1]=document.getElementById("swdestextarea").value;
-    dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath");
+    dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath").replace(/,$/gi,"")+"]";
 
 
 
@@ -632,6 +635,8 @@ chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
     if(request.uploadstate!=null)
     {
         document.getElementById("swuploadat").style.display="none";
+
+
         if(request.uploadstate="true")
         {
 
@@ -865,6 +870,10 @@ function analyseElement(e)
 
          var xpath=getPathTo(e.target)
     var currentE=document.getElementById(currentinputid);
+    if(currentE==null)
+    {
+        return;
+    }
     if(currentE.name=="price"&&(e.target.textContent.indexOf("$")<0))
     {
         currentE.value+="$";
@@ -874,14 +883,35 @@ function analyseElement(e)
     {
 
     }
-    else {
-        currentE.value += e.target.textContent;
+    else
+    {
+        var content= e.target.textContent;
         if(e.target.textContent==null)
         {
-            currentE.value+= e.target.parentNode.textContent;
-        }
+             content=e.target.parentNode.textContent;
 
-        currentE.setAttribute("xpath",xpath);
+        }
+        currentE.value+=" "+getRidOfDupWhitespace(content.replace(/(^\s*)|(\s*$)/g,""));
+        if(currentE.localName=="textarea")
+        {
+              var fxpath=currentE.getAttribute("xpath");
+              fxpath=fxpath+"\""+xpath+"\""+",";
+              currentE.setAttribute("xpath",fxpath);
+        }
+        else
+        {
+
+            currentE.setAttribute("xpath", xpath);
+        }
+    }
+    if(currentE.localName=="textarea")
+    {
+
+    }
+    else
+    {
+        currentE.blur();
+        currentinputid="";
     }
 
 
@@ -1028,9 +1058,9 @@ function listenADDnodeImg(state)
    }
 
 
-
-
 }
+// 开启监听
+listenADDnodeImg(true);
 
 // 分析节点的变化 并进行响应的动作
 
@@ -1162,4 +1192,8 @@ function strDealJsonvalueReplace(v) {
     v=v.replace(/\"/g,"”");//替换半角双引号为全角双引号
     v=v.replace(/(^\s*)|(\s*$)/g,"");//this.replace(/(^\s*)|(\s*$)/g,'')
     return v;
+}
+
+function getRidOfDupWhitespace(content) {
+    return content.replace(/\s\s\s*/g,' ');
 }

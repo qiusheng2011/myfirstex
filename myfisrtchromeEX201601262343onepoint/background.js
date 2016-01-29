@@ -87,16 +87,17 @@ chrome.runtime.onMessage.addListener(
                         return false;
                     }
                     if (oReq.status == 200 && oReq.readyState == 4) {
-
+                           var result=JSON.parse(oReq.responseText);
                         if (oReq.responseText.indexOf("true") > 0) {
-                            alert("大王,您已经巡山成功!");
+                           // alert("大王,您已经巡山成功!");
                              sendUploadState(true,url);
-                            notification.show();
+                             showNotification( true,result.product_id+"大王,您已经巡山成功!",sourcesURL,JSON.parse(json));
 
                         }
                         else {
-                            alert("呜呜,失败了,请重试!");
+                            //alert("呜呜,失败了,请重试!");
                             sendUploadState(false,url);
+                            showNotification(false,"彻彻底底的失败了!再试一次吧",sourcesURL,JSON.parse(json));
 
                         }
 
@@ -264,8 +265,44 @@ chrome.tabs.query({url:urlm},function(tabs){
 
 // 通知
 //
-//var notification = webkitNotifications.createNotification(
-//    'apple.png',  // icon url - can be relative
-//    '上传成功',  // notification title
-//    '222222666666666666'  // notification body text
-//);
+showNotification(true,"avarsha tool 开始工作了","start",{website:{value:"http://www.avarsha.com"},category:{value:"吼吼"},price:{value:"无价"},productname:{value:"0.2版本"},descript:{value:""}});
+ function showNotification(state,attention,url,productinfo)
+ {
+
+     var body="\n来源:"+productinfo.website.value
+         +"\n分类:"+productinfo.category.value
+         +"\n产品名字:"+productinfo.productname.value
+         +"\n产品价格:"+productinfo.price.value
+         +"\n产品描述:"+productinfo.descript.value;
+        var icon=(state?"notrue.png":"nofalse.png");
+
+   var  notiMessage=new Notification(attention, {
+         icon: icon,
+         body: body,
+          tag:url
+     });
+    if(state==false)
+    {
+        notiMessage.onclick = function(e) {
+            alert(body);
+            window.open(url, '_blank');
+
+        }
+
+    }
+     else{
+        window.setTimeout(function (e) {
+            notiMessage.close();
+
+        }, 3000);
+        notiMessage.onclick = function(e) {
+            //window.open('http://www.mozilla.org', '_blank');
+            e.target.close();
+            alert(body);
+        }
+    }
+
+
+
+
+ }
