@@ -265,6 +265,9 @@ chrome.tabs.query({url:urlm},function(tabs){
 
 // 通知
 //
+chrome.tabs.create({
+    url: 'about.html'
+});
 showNotification(true,"avarsha tool 开始工作了","start",{website:{value:"http://www.avarsha.com"},category:{value:"吼吼"},price:{value:"无价"},productname:{value:"0.2版本"},descript:{value:""}});
  function showNotification(state,attention,url,productinfo)
  {

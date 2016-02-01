@@ -46,5 +46,18 @@ var button =document.getElementById("showhomepagebt");
 
 
 
+function  openAbout()
+{
+    chrome.tabs.create({
+        url: 'about.html'
+    });
+
+
+}
+
+
+
 document.getElementById("showhomepagebt").addEventListener("click",openConfrim);
+
+document.getElementById("abouttool").addEventListener("click",openAbout);
 
