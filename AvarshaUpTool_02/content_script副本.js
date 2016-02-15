@@ -8,8 +8,6 @@ var globalState=false;
 //
 var currentinputid="none";
 
-var   allimgJsonArray={};
-
 
 
 
@@ -52,6 +50,8 @@ function  changeDomState()
      }
 
 }
+//alert("实验");
+//changeDomState();
 
 
 //----------------------- MAIN --------
@@ -59,7 +59,8 @@ var xhr=new XMLHttpRequest();
 
 var element=document.getElementById("test");
 
-
+//ShowInputWindow(true);
+//window.addEventListener("onclick",clickElement);
 window.onclick=function(e){
    return clickElement(e);
 };
@@ -221,7 +222,12 @@ function ShowInputWindow(state) {
        // body.appendChild(suspensionWindow);
     body.insertBefore(suspensionWindow,body.firstElementChild);
     //
-
+    //suspensionWindow.style.width="350px";
+    //suspensionWindow.style.cssText="font-size:10px!important;top:20px;min-height:300px;z-index:999999;padding:5px;position:fixed;background:#3388FF;opacity:0.75;overflow:hidden;";
+    //suspensionWindow.style.display="none";
+    //suspensionWindow.style.float="left";
+    //suspensionWindow.style.left=null;
+    //suspensionWindow.style.right="10px";
      var currentTabUrl=window.location.href;
 
 
@@ -230,7 +236,7 @@ function ShowInputWindow(state) {
         +"<div class='sw line'><p class='sw'><strong  class='sw'>分类【CollectionName】:</strong></p><input class='sw' type=\"text\" id='swinput1' name='category' dropzone=value /><button class='swsusclearbt' >clear</button></div>"
         +"<div class='sw line'><p class='sw'><strong  class='sw'>产品名称【ProductName】:</strong></p> <input class='sw' type=\"text\"  id='swinput2' name='productname' /><button class='swsusclearbt'>clear</button> </div>"
         +"<div class='sw line'><p class='sw'><strong  class='sw'>产品价格【Price】:</strong></p><input class='sw' type=\"text\" name='price' id='swinput3'  /><button class='swsusclearbt'  >clear</button></div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
+        +"<div class='sw line'><p class='sw'><strong  class='sw'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' xpath='[' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
         +"<div class='sw line'><p class='sw'><strong  class='sw'>产品图片【Product Img】:</strong></p><button id='swsusallbtimg' class='swsusallbtimg'   >allImg</button><button id='swsusclearbtimg' class='swsusclearbtimg'>clear</button></div>"
         +"<br>"
     +"<button id='confirmpinfobt'  class='swsubmit' value='submit' style='margin:5px auto 10px;display:block;'>SUBMIT</button>";
@@ -239,7 +245,7 @@ function ShowInputWindow(state) {
     openconfirm.innerHTML="function openConfrim(id){"+"if(id.name==\"OFF\"){id.name=\"ON\";id.innerHTML=\"pick up  web ON\";id.style.background=\"#61CE3C\";}else{id.name=\"OFF\";id.innerHTML=\"pick up  web OFF\";id.style.background=\"#BD2D30\";}}";
      suspensionWindow.appendChild(openconfirm);
 
-    var suspensionwindowStyleContent="#suspensionwindow{width:380px;background:rgba(0,0,0,0.6);color:#fff;position:fixed;right:10px;top:60px;font:400 12px/1.2 Helvetica;overflow:hidden;z-index:99999;border-radius:5px;padding:5px;margin: 0 0 0 5px;max-height:90vh;overflow-Y:auto;}";
+    var suspensionwindowStyleContent="#suspensionwindow{width:350px;background:rgba(0,0,0,0.6);color:#fff;position:fixed;right:10px;top:60px;font:400 12px/1.2 Helvetica;overflow:hidden;z-index:99999;border-radius:5px;padding:5px;margin: 0 0 0 5px;max-height:90vh;overflow-Y:auto;}";
     suspensionwindowStyleContent+="#suspensionwindow .line{overflow:hidden;margin-bottom:10px;}";
     suspensionwindowStyleContent+="#suspensionwindow button{width:50px;height:18px;left:5px; line-height:18px;background:#f47737;color:#fff;border-radius:4px;margin-left:5px;border:none; padding:0;margin:0 0 0 5px;}";
     suspensionwindowStyleContent+="#suspensionwindow p.sw{width:160px;float:left;text-align:left;margin:0;line-height:18px;}";
@@ -328,6 +334,8 @@ function   inputGetfocus(e)
 
     currentinputid= e.target.id;
 
+
+
 }
 
 
@@ -375,13 +383,22 @@ function  clearImgContent(id)
             }
             else
             {
-                delete allimgJsonArray[imglist[i].src];
                 imgDiv.removeChild(imglist[i].parentNode);
 
             }
 
         }
-
+       // var imgAlllist=imgDiv.getElementsByTagName("img");
+       // var  allimglist=imgDiv.getElementsByTagName("img")
+       // if(allimglist.length>=5) {
+       //     imgDiv.style.height = ((allimglist.length - (allimglist.length%5))/5+ 2) * 50 + "px";
+       // }
+       // else
+       // {
+       //     imgDiv.style.height ="50px";
+       // }
+       // var suspensionWindow=document.getElementById("suspensionwindow");
+       // suspensionWindow.style.height=(Number(imgDiv.style.height)+350)+"px";
 
     }
 
@@ -391,11 +408,28 @@ function  clearImgContent(id)
 // 清空单张图片内容
 function clearSingleImg(id)
 {
-
-      delete allimgJsonArray[id.target.src];
     var suspensionWindow=document.getElementById("suspensionwindow");
     var imgDiv=document.getElementById("susimglist");
     imgDiv.removeChild(id.target.parentNode);
+
+    var  allimglist=imgDiv.getElementsByTagName("img")
+   // if(allimglist.length>=5) {
+   //     imgDiv.style.height = ((allimglist.length - (allimglist.length%5))/5+ 2) * 50 + "px";
+   // }
+   // else
+   // {
+   //     imgDiv.style.height ="50px";
+   // }
+   //
+   // var submitbt=document.getElementById("confirmpinfobt");
+   //
+   //
+   //// suspensionWindow.insertBefore(imgDiv,submitbt);
+   ////suspensionWindow.style.height=(Number(imgDiv.style.height)+350)+"px";
+   // suspensionWindow.clientHeight=imgDiv.clientHeight+350;
+
+
+
 
 }
 
@@ -425,12 +459,16 @@ function  submitContent(id)
         }
         else
         {
-            if(i==4)
+            if(i==3)
             {
-               // fromList[i].value=document.getElementById("swdestextarea").value;
+                if(fromList[i].name=="price"&&(fromList[i].value.indexOf("$")<0))
+                {
+                    fromList[i].value="$"+fromList[i].value;
+
+                }
             }
 
-               dataArray[i][0]=fromList[i].getAttribute("name");
+              dataArray[i][0]=fromList[i].getAttribute("name");
               dataArray[i][1]=String(fromList[i].value);
               dataArray[i][2]=fromList[i].getAttribute("xpath");
 
@@ -439,7 +477,7 @@ function  submitContent(id)
         }
     }
       dataArray[4][1]=document.getElementById("swdestextarea").value;
-    dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath");
+    dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath").replace(/,$/gi,"")+"]";
 
 
 
@@ -579,7 +617,6 @@ function clearALLContent()
         for (var i = imglist.length - 1; i >= 0; i--) {
 
             imgDiv.removeChild(imglist[i].parentNode);
-            allimgJsonArray={};
 
 
 
@@ -614,7 +651,42 @@ function openConfrimD(e){
 
 }
 
+
+
 // --------------------数据通信 -------------------
+//chrome.runtime.onMessage.addListener(function (request,sender,sendResponse) {
+//
+//        if(request.state=="true")
+//        {
+//            ShowInputWindow(true);
+//
+//
+//        }
+//        else if(request.state=="false")
+//        {
+//            ShowInputWindow(false);
+//        }
+//
+//
+//        if(request.uploadstate!=null)
+//        {
+//            if(request.uploadstate="true")
+//            {
+//                document.getElementById("swuploadat").style.display="none";
+//
+//
+//            }
+//
+//
+//
+//        }
+//
+//        sendResponse({code:"200"});
+//
+//    }
+//);
+
+
 chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
 
     if(request.state=="true")
@@ -712,28 +784,6 @@ function  analyseBodyImg(e)
 
 }
 
-/////图片去重
-function avoidRepetitionImg(list)
-{
-    var n={},r=[];
-
-    for(var i=0;i<list.length;i++)
-    {
-        if(!r[list[i].src])
-        {
-             n[list.src]=true;
-            r.push(list[i]);
-        }
-
-
-    }
-    console.log("去掉了:"+(list.length- r.length));
-    return  r;
-
-}
-
-
-// 分析含有 图片的节点
 
 function  analyseImgElemente(e)
 {
@@ -746,80 +796,54 @@ function  analyseImgElemente(e)
          imgDiv.id="susimglist";
          var submitbt=document.getElementById("confirmpinfobt");
          //suspensionWindow.insertBefore(imgDiv,submitbt);
-         submitbt.parentNode.insertBefore(imgDiv,submitbt.previousElementSibling);
+            submitbt.parentNode.insertBefore(imgDiv,submitbt.previousElementSibling);
      }
      var  ppnode=getNodeWhoseChildsAreMore(e);
      var imgListSet=ppnode.getElementsByTagName("img");
-   //先去重后排序
-     var imgList=sortImglist(avoidRepetitionImg(imgListSet));
+      var imgList=sortImglist(imgListSet);
 
-    //当前可选图片的数组
-     var displayImgList=imgDiv.getElementsByTagName("img");
 
     for(var i=0;i<imgList.length;i++)
     {
-
-        if(imgList[i].className=="swimg"||parseFloat(imgList[i].naturalHeight)<102.0||parseFloat(imgList[i].naturalWidth)<102.0)
+        if(imgList[i].className=="swimg")
         {
              continue;
         }
-        if(allimgJsonArray[imgList[i].src])
-        {
-            continue;
-        }
-        allimgJsonArray[imgList[i].src]=true;
-
         var img=document.createElement("img");
         var img_c=document.createElement("div");
         var img_des=document.createElement("p");
+        //img_des.style.backgroundColor="#000000";
+        //img_des.style.color="#FFFFFF";
         img_des.className="swimgdes";
         img_des.textContent=imgList[i].naturalWidth+" X "+imgList[i].naturalHeight;
-        img.setAttribute("area",""+parseFloat(imgList[i].naturalWidth)*parseFloat(imgList[i].naturalHeight)+"");
         img_des.textAlign="center";
         img_des.name="markoff";
         img_c.appendChild(img);
         img_c.appendChild(img_des);
         img_c.className="swimg-item";
+        //img_c.style.cssText="float:left;margin:2px;border:1px solid #ddd;padding:2px;";
         img.className="swimg";
+
+        //img.style.width="40.5px";
+        //img.style.height=img.style.width;
+        //img.style.margin="5px";
         img.src=imgList[i].src;
         img.name=getPathTo(imgList[i]);
-
-        for(var b=0;b<displayImgList.length;b++)
-        {
-            if(displayImgList[b].nextElementSibling.name=="markon")
-            {
-                if(b=displayImgList.length)
-                {
-                    imgDiv.appendChild(img_c);
-                }
-                continue;
-            }
-            var a=parseFloat(img.getAttribute("area"));
-            var d=parseFloat(displayImgList[b].getAttribute("area"));
-            if(a>=d)
-            {
-
-                imgDiv.insertBefore(img_c,displayImgList[b].parentNode);
-                break;
-            }
-            else {
-                imgDiv.appendChild(img_c);
-
-            }
-
-        }
-        if(displayImgList.length==0)
-        {
-            imgDiv.appendChild(img_c);
-        }
-
-
-      //  imgDiv.appendChild(img_c);
+        imgDiv.appendChild(img_c);
         img.addEventListener("click",clearSingleImg,false);
         img_des.addEventListener("click",changeImgMarkState,false)
     }
 
-
+  //var  allimglist=imgDiv.getElementsByTagName("img")
+  //  if(allimglist.length>=5) {
+  //      imgDiv.style.height = ((allimglist.length - (allimglist.length%5))/5+ 2) * 50 + "px";
+  //  }
+  //  else
+  //  {
+  //      imgDiv.style.height ="50px";
+  //  }
+  //
+  //  suspensionWindow.style.height=(Number(imgDiv.style.height)+350)+"px";
 
 }
 
@@ -862,9 +886,12 @@ function analyseElement(e)
 
 
 
-
-         var xpath=getPathTo(e.target)
+    var xpath=getPathTo(e.target);
     var currentE=document.getElementById(currentinputid);
+    if(currentE==null)
+    {
+        return;
+    }
     if(currentE.name=="price"&&(e.target.textContent.indexOf("$")<0))
     {
         currentE.value+="$";
@@ -874,14 +901,35 @@ function analyseElement(e)
     {
 
     }
-    else {
-        currentE.value += e.target.textContent;
+    else
+    {
+        var content= e.target.textContent;
         if(e.target.textContent==null)
         {
-            currentE.value+= e.target.parentNode.textContent;
-        }
+             content=e.target.parentNode.textContent;
 
-        currentE.setAttribute("xpath",xpath);
+        }
+        currentE.value+=" "+getRidOfDupWhitespace(content.replace(/(^\s*)|(\s*$)/g,""));
+        if(currentE.localName=="textarea")
+        {
+              var fxpath=currentE.getAttribute("xpath");
+              fxpath=fxpath+"\""+xpath+"\""+",";
+              currentE.setAttribute("xpath",fxpath);
+        }
+        else
+        {
+
+            currentE.setAttribute("xpath", xpath);
+        }
+    }
+    if(currentE.localName=="textarea")
+    {
+
+    }
+    else
+    {
+        currentE.blur();
+        currentinputid="";
     }
 
 
@@ -990,7 +1038,8 @@ function analyseADDNode(e)
     }
     else  if(e.type== "DOMNodeInserted")
     {
-
+        listenADDnodeImg(false);
+        listenADDnodeImg(true);
 
 
 
@@ -998,101 +1047,44 @@ function analyseADDNode(e)
 }
 
 
-var MutationObserver=window.MutationObserver||WebKitMutationObserver || window.MozMutationObserver
-var mutaObserver;
+
 //  开启 关闭  自动监听
 function listenADDnodeImg(state)
 {
    if(state) {
+       document.addEventListener("DOMNodeInserted",analyseADDNode,false);
 
-       if(mutaObserver!=null)
-       {
-           var config = { attributes: true, childList: true,subtree:true, characterData: false };
-           mutaObserver.observe(document.body,config);
-       }
+       document.addEventListener("DOMAttrModified",analyseADDNode,false);
 
 
-
-       mutaObserver=new MutationObserver(function(mutations)
-       {
-           console.log(mutations);
-           analyseDomChange(mutations);
-       });
-       var config = { attributes: true, childList: true,subtree:true,characterData:false};
-       mutaObserver.observe(document.body,config);
    }
     else
    {
+        document.removeEventListener("DOMNodeInserted",analyseADDNode,false);
+        document.removeEventListener("DOMAttrModified",analyseADDNode,false);
 
-        mutaObserver.disconnect();
+
    }
 
 
 
 
 }
-
-// 分析节点的变化 并进行响应的动作
-
-function  analyseDomChange(mutations)
-{
-     for(var i=0; i<mutations.length;i++)
-     {
-
-         if(mutations[i].target.className.indexOf("sw")>0)
-         {
-             return;
-         }
-       var mutationRecord=mutations[i];
-         if(mutationRecord.addedNodes!=null&&mutationRecord.type=="childList")
-         {
-             var nodelist=mutationRecord.addedNodes;
-             if(nodelist.length>0) {
-                 for(var b=0;b<nodelist.length;b++) {
-
-                     //if(nodelist[b].className.indexOf("sw")>0)
-                     //{
-                     //    return;
-                     //}
-                     analyseImgElemente(nodelist[b]);
-                 }
-             }
-
-
-         }else if(mutationRecord.type=="attributes")
-         {
-             if(mutationRecord.attributeName=="src") {
-                 var ce=mutationRecord.target.parentNode;
-                 if(ce.className=="swimg-item"){
-                    return;
-                 }
-                 else
-                 {
-                     analyseImgElemente(mutationRecord.target);
-                 }
-             }
-         }
-
-
-
-     }
-
-
-}
-
-
-
-
-
-
-
-// ------------------------ 监听分析-------------------------
 //------------------------ 鼠标 拖动
 
 var xl;
 var yl;
 function  moveSWDIV(e)
 {
+    // e=e||window.event;
+    //var x=e.clientX; //鼠标移动时获取x轴坐标
+    //var y=e.clientY; //鼠标移动时获取y轴坐标
+    //
+    //e.target.style.left +=(xl-x)+"px";//将移动后的坐标赋给相应的位移
+    //e.target.style.top += (yl-y)+"px";
+    //xl= e.clientX;
+    //yl= e.clientY;
+
 
 
 }
@@ -1162,4 +1154,8 @@ function strDealJsonvalueReplace(v) {
     v=v.replace(/\"/g,"”");//替换半角双引号为全角双引号
     v=v.replace(/(^\s*)|(\s*$)/g,"");//this.replace(/(^\s*)|(\s*$)/g,'')
     return v;
+}
+
+function getRidOfDupWhitespace(content) {
+    return content.replace(/\s\s\s*/g,' ');
 }

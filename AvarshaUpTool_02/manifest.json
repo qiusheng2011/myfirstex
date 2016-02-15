@@ -1,8 +1,8 @@
 {
 	"manifest_version":2,
-   "name":"AVARSHA_PRODUCT_CAPTURE_TOOL_current",
+   "name":"AVARSHA_PRODUCT_CAPTURE_TOOL",
     "version":"0.2",
-    "description":"获取产品页的信息,第0.2current版 使用过程中有任何问题和好的建议,欢迎提出,不好的地方,请及时赐教,感激不尽! ",
+    "description":"获取产品页的信息,第0.2版20160129 使用过程中有任何问题和好的建议,欢迎提出,不好的地方,请及时赐教,感激不尽! ",
      "icons":{"16":"apple.png","128":"apple.png"},
      "background":{
           "script":"background.js",
@@ -24,7 +24,7 @@
         "default_popup":"popup.html",
         "default_js":"popup.js"
      },
-  "web_accessible_resources": [
+     "web_accessible_resources": [
     "apple.png",
     "nofalse.png",
     "notrue.png"
