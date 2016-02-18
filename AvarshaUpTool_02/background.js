@@ -6,6 +6,9 @@ var tacitSetCn="";
 //var specialurllist=["http://www.saksfifthavenue.com/","http://www.baidu.com"];
 var specialurllist=[];
 
+
+var tempclickactionlist;
+
 function openConfrimB(state){
 
      openState=state;
@@ -44,7 +47,11 @@ chrome.runtime.onMessage.addListener(
             "from the extension");
         if (request.getState == "state") {
            var aresult=analyseIsSpecialURL(request.taburl);
-            sendResponse({state: openState,tacitcnb:tacitSetCn,isspecialurl:aresult});
+            if(tempclickactionlist==null)
+            {
+                tempclickactionlist=[];
+            }
+            sendResponse({state: openState,tacitcnb:tacitSetCn,isspecialurl:aresult,clickactiondata:tempclickactionlist});
         }
         else
         {
@@ -57,6 +64,7 @@ chrome.runtime.onMessage.addListener(
                 if(request.tacitcn!=null)
                 {
                     tacitSetCn=request.tacitcn;
+                    tempclickactionlist=request.clickactiondata;
 
                 }
 

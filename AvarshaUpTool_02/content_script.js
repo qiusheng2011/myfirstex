@@ -8,9 +8,13 @@ var globalState=false;
 //
 var currentinputid="none";
 
-var   allimgJsonArray={};
+var allimgJsonArray={};
 
-var  isspecialURL=false;
+var isspecialURL=false;
+
+// 记录当前 点击目标
+var currentElement="";
+var clickactionlist=[];
 
 
 
@@ -145,10 +149,7 @@ function  clickElement(e)
         }
         else
         {
-            e.stopPropagation();
-            // 跳过显示界面
-            var temp= e.target;
-            console.log(e.target);
+
 
 
             if(e.target.id=="suspensionwindow"|| e.target.className.indexOf("sw")>=0)
@@ -161,6 +162,12 @@ function  clickElement(e)
                 return false;
             }
             else {
+                e.stopPropagation();
+                // 跳过显示界面
+                var temp= e.target;
+                currentElement=temp;
+                console.log(e.target);
+
                  if(e.target.localName=="img"|| e.target.getElementsByTagName("img").length>0)
                  {
 
@@ -238,7 +245,7 @@ function ShowInputWindow(state) {
         +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品价格【Price】:</strong></p><input class='sw' type=\"text\" name='price' id='swinput3'  /><button class='swsusclearbt'  >clear</button></div>"
         +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' xpath='[' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
         +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品图片【Product Img】:</strong></p><button id='swsusallbtimg' class='swsusallbtimg'   >allImg</button><button id='swsusclearbtimg' class='swsusclearbtimg'>clear</button></div>"
-        +"<br>"
+        +"<div class='swimgdiv' id='susimglist' ></div><br>"
     +"<button id='confirmpinfobt'  class='swsubmit' value='submit' style='width: 290px;height: 45px; margin:5px auto 10px;display:block;'>SUBMIT</button>";
     var openbutton= document.getElementById("swopenbt");
     var  openconfirm=document.createElement("script");
@@ -457,7 +464,7 @@ function  submitContent(id)
 
         }
     }
-      dataArray[4][1]=document.getElementById("swdestextarea").value;
+    dataArray[4][1]=document.getElementById("swdestextarea").value;
     dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath").replace(/,$/gi,"")+"]";
 
 
@@ -546,9 +553,9 @@ function  submitContent(id)
     }
              //  sendDataToserver(sendstring)
             document.getElementById("swuploadat").style.display="";
-             document.getElementById("swuploadat").innerText="LOADING";
+            document.getElementById("swuploadat").innerText="LOADING";
             var collectionName=document.getElementById("swinput1").value;
-            chrome.runtime.sendMessage({getState:"submit",data:sendstring,imgData:imgUrlList,url:window.location.href,tacitcn:collectionName,hasspider:"false"},function(response)
+            chrome.runtime.sendMessage({getState:"submit",data:sendstring,imgData:imgUrlList,url:window.location.href,tacitcn:collectionName,hasspider:"false",clickactiondata:clickactionlist},function(response)
             {
                 if(response.code.toString()=="200")
                 {
@@ -615,7 +622,7 @@ function clearALLContent()
         }
     }
 
-     var textarea=document.getElementById("swdestextarea");
+    var textarea=document.getElementById("swdestextarea");
       textarea.value="";
       textarea.setAttribute("xpath","[");
 
@@ -625,6 +632,7 @@ function clearALLContent()
     //rootDIV.style.height="350px";
     // imgDiv.parentNode.removeChild(imgDiv);
     var imglist=imgDiv.getElementsByTagName("img");
+    allimgJsonArray={};
     if(imglist.length>0) {
         for (var i = imglist.length - 1; i >= 0; i--) {
 
@@ -681,6 +689,8 @@ chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
     }
 
 
+
+
     if(request.uploadstate!=null)
     {
         document.getElementById("swuploadat").style.display="none";
@@ -719,7 +729,18 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname},fu
      {
          ShowInputWindow(false);
      }
+     if(response.clickactiondata.length>0)
+     {
+         for(var i=0;i<response.clickactiondata.length>0;i++)
+         {
+                var element=getNodesByxpath(response.clickactiondata[i],document)[0];
+               element.click();
 
+         }
+
+
+
+     }
 
     //
     if(response.isspecialurl)
@@ -820,15 +841,23 @@ function  analyseImgElemente(e)
          imgDiv.id="susimglist";
          var submitbt=document.getElementById("confirmpinfobt");
          //suspensionWindow.insertBefore(imgDiv,submitbt);
-         submitbt.parentNode.insertBefore(imgDiv,submitbt.previousElementSibling);
+         if(submitbt!=null) {
+             suspensionWindow.insertBefore(imgDiv, submitbt.previousElementSibling);
+         }
      }
      var  ppnode=getNodeWhoseChildsAreMore(e);
      var imgListSet=ppnode.getElementsByTagName("img");
+    if(imgListSet.length<=0)
+    {
+        return false;
+    }
    //先去重后排序
      var imgList=sortImglist(avoidRepetitionImg(imgListSet));
 
     //当前可选图片的数组
-     var displayImgList=imgDiv.getElementsByTagName("img");
+   //  var displayImgList=imgDiv.getElementsByTagName("img");
+
+
 
     for(var i=0;i<imgList.length;i++)
     {
@@ -858,42 +887,52 @@ function  analyseImgElemente(e)
         img.src=imgList[i].src;
         img.name=getPathTo(imgList[i]);
 
-        for(var b=0;b<displayImgList.length;b++)
-        {
-            if(displayImgList[b].nextElementSibling.name=="markon")
-            {
-                if(b=displayImgList.length)
-                {
-                    imgDiv.appendChild(img_c);
-                }
-                continue;
-            }
-            var a=parseFloat(img.getAttribute("area"));
-            var d=parseFloat(displayImgList[b].getAttribute("area"));
-            if(a>=d)
-            {
+        //当前可选图片的数组
+        var displayImgList=imgDiv.getElementsByTagName("img");
 
-                imgDiv.insertBefore(img_c,displayImgList[b].parentNode);
-                break;
-            }
-            else {
-                imgDiv.appendChild(img_c);
-
-            }
-
-        }
         if(displayImgList.length==0)
         {
             imgDiv.appendChild(img_c);
         }
+        else
+        {
+            for(var b=0;b<displayImgList.length;b++)
+            {
+                //if(displayImgList[b].nextElementSibling.name=="markon")
+                //{
+                //    if(b==(displayImgList.length-1))
+                //    {
+                //        imgDiv.appendChild(img_c);
+                //        break;
+                //
+                //    }
+                //    continue;
+                //
+                //}
+                var a=parseFloat(img.getAttribute("area"));
+                var d=parseFloat(displayImgList[b].getAttribute("area"));
+                if(a>=d&&displayImgList[b].nextElementSibling.name!="markon")
+                {
+
+                    imgDiv.insertBefore(img_c,displayImgList[b].parentNode);
+                    break;
+                }
+                if(b==displayImgList.length-1){
+                    imgDiv.appendChild(img_c);
+                }
+
+            }
 
 
-      //  imgDiv.appendChild(img_c);
+        }
+
+
+        //  imgDiv.appendChild(img_c);
         img.addEventListener("click",clearSingleImg,false);
         img_des.addEventListener("click",changeImgMarkState,false)
     }
 
-
+   return true;
 
 }
 
@@ -991,6 +1030,10 @@ function analyseElement(e)
 
 
 function getPathTo(element) {
+    if(element==null)
+    {
+        return "";
+    }
     if (element.id!=='')
         return 'id("'+element.id+'")';
     if (element===document.body)
@@ -1152,7 +1195,11 @@ function  analyseDomChange(mutations)
                      //{
                      //    return;
                      //}
-                     analyseImgElemente(nodelist[b]);
+                    result= analyseImgElemente(nodelist[b]);
+                     if(result)
+                     {
+                         clickactionlist.push(getPathTo(currentElement));
+                     }
                  }
              }
 
@@ -1166,6 +1213,10 @@ function  analyseDomChange(mutations)
                  }
                  else
                  {
+
+                     clickactionlist.push(getPathTo(currentElement));
+
+                     currentElement=null;
                      analyseImgElemente(mutationRecord.target);
                  }
              }
@@ -1350,5 +1401,28 @@ function selectNodes(xmldoc,sXpath){
 
     }else{
         return null;
+    }
+}
+
+
+// 根据路径获取  节点
+
+function  getNodesByxpath(xpath, context)
+{
+    var doc = (context && context.ownerDocument)||document;
+    var result = doc.evaluate(xpath, context || doc, null, XPathResult.ANY_TYPE, null);
+    switch (result.resultType) {
+        case XPathResult.NUMBER_TYPE:
+            return result.numberValue;
+        case XPathResult.STRING_TYPE:
+            return result.stringValue;
+        case XPathResult.BOOLEAN_TYPE:
+            return result.booleanValue;
+        default:
+            var nodes = [];
+            var node;
+            while (node = result.iterateNext())
+                nodes.push(node);
+            return nodes;
     }
 }
