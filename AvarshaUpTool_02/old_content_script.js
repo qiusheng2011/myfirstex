@@ -8,11 +8,26 @@ var globalState=false;
 //
 var currentinputid="none";
 
+var allimgJsonArray={};
+
+var isspecialURL=false;
+
+// 记录当前 点击目标
+var currentElement="";
+
+var clickactionlist=[];
+var clickactiontargetxpathlist={};
+
+
+
+
+
+
 
 
 
 var dataArray=new Array( new Array(),new Array(),new Array(),new Array(),new Array(),new Array());
-var dataName=new Array("website","catagory","productname","price","descript","images");
+var dataName=new Array("website","category","productname","price","descript","images");
 for(var i=0;i<dataArray.length;i++ )
 {
     dataArray[i][0]=dataName[i];
@@ -50,8 +65,6 @@ function  changeDomState()
      }
 
 }
-//alert("实验");
-//changeDomState();
 
 
 //----------------------- MAIN --------
@@ -59,8 +72,7 @@ var xhr=new XMLHttpRequest();
 
 var element=document.getElementById("test");
 
-//ShowInputWindow(true);
-//window.addEventListener("onclick",clickElement);
+
 window.onclick=function(e){
    return clickElement(e);
 };
@@ -141,10 +153,7 @@ function  clickElement(e)
         }
         else
         {
-            e.stopPropagation();
-            // 跳过显示界面
-            var temp= e.target;
-            console.log(e.target);
+
 
 
             if(e.target.id=="suspensionwindow"|| e.target.className.indexOf("sw")>=0)
@@ -157,6 +166,12 @@ function  clickElement(e)
                 return false;
             }
             else {
+                e.stopPropagation();
+                // 跳过显示界面
+                var temp= e.target;
+                currentElement=temp;
+                console.log(e.target);
+
                  if(e.target.localName=="img"|| e.target.getElementsByTagName("img").length>0)
                  {
 
@@ -222,34 +237,30 @@ function ShowInputWindow(state) {
        // body.appendChild(suspensionWindow);
     body.insertBefore(suspensionWindow,body.firstElementChild);
     //
-    //suspensionWindow.style.width="350px";
-    //suspensionWindow.style.cssText="font-size:10px!important;top:20px;min-height:300px;z-index:999999;padding:5px;position:fixed;background:#3388FF;opacity:0.75;overflow:hidden;";
-    //suspensionWindow.style.display="none";
-    //suspensionWindow.style.float="left";
-    //suspensionWindow.style.left=null;
-    //suspensionWindow.style.right="10px";
+
      var currentTabUrl=window.location.href;
 
 
-    suspensionWindow.innerHTML="<p class='swat' id='swuploadat' style='font-size: 35px;color: #BD2D30;display:none'>loading</p><div class='sw line' style='text-align:center'><button class='sw'  id='swopenbt' type=\"button\" name=\"OFF\" value=\"pick up  web OFF\" onclick='openConfrim(this)' style=\"background:#BD2D30;text-align:center;width:auto;padding:0 20px;margin:0 auto;\">pick up  web OFF </button><button class='sw'  id='swisupbt' type=\"button\" name=\"OFF\" >ISUP</button></div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>网站地址【website】:</strong></p><input class='swiput' type=\"text\" name='website' value='"+ currentTabUrl+"' ><button disabled='disabled'style='background:#333333;' class='swsusclearbt'>clear</button></div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>分类【CollectionName】:</strong></p><input class='sw' type=\"text\" id='swinput1' name='category' dropzone=value /><button class='swsusclearbt' >clear</button></div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>产品名称【ProductName】:</strong></p> <input class='sw' type=\"text\"  id='swinput2' name='productname' /><button class='swsusclearbt'>clear</button> </div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>产品价格【Price】:</strong></p><input class='sw' type=\"text\" name='price' id='swinput3'  /><button class='swsusclearbt'  >clear</button></div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' xpath='[' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
-        +"<div class='sw line'><p class='sw'><strong  class='sw'>产品图片【Product Img】:</strong></p><button id='swsusallbtimg' class='swsusallbtimg'   >allImg</button><button id='swsusclearbtimg' class='swsusclearbtimg'>clear</button></div>"
-        +"<br>"
-    +"<button id='confirmpinfobt'  class='swsubmit' value='submit' style='margin:5px auto 10px;display:block;'>SUBMIT</button>";
+    suspensionWindow.innerHTML="<p class='swat' id='swuploadat1' style='font-size: 25px;color: #BD2D30;display:none'>loading</p><div class='sw swline' style='text-align:center'><button class='sw'  id='swopenbt' type=\"button\" name=\"OFF\" value=\"pick up  web OFF\" onclick='openConfrim(this)' style=\"background:#BD2D30;text-align:center;width:auto;padding:0 20px;margin:0 auto;\">pick up  web OFF </button><button class='sw'  id='swisupbt' type=\"button\" name=\"OFF\" >ISUP</button></div>"
+        +"<div class='sw swline'><p class='swat' id='swuploadat' style='font-size: 25px;color: #BD2D30;display:none'>loading</p></div>"
+        +"<div class='sw swline'><p class='sw'><strong  class='sw'>网站地址【website】:</strong></p><input class='swiput' type=\"text\" name='website' value='"+ currentTabUrl+"' ><button disabled='disabled'style='background:#333333;' class='swsusclearbt'>clear</button></div>"
+        +"<div class='sw swline'><p class='sw'><strong  class='sw'>分类【CollectionName】:</strong></p><input class='sw' type=\"text\" id='swinput1' name='category' dropzone=value /><button class='swsusclearbt' >clear</button></div>"
+        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品名称【ProductName】:</strong></p> <input class='sw' type=\"text\"  id='swinput2' name='productname' /><button class='swsusclearbt'>clear</button> </div>"
+        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品价格【Price】:</strong></p><input class='sw' type=\"text\" name='price' id='swinput3'  /><button class='swsusclearbt'  >clear</button></div>"
+        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' xpath='[' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
+        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品图片【Product Img】:</strong></p><button id='swsusallbtimg' class='swsusallbtimg'   >allImg</button><button id='swsusclearbtimg' class='swsusclearbtimg'>clear</button></div>"
+        +"<div class='swimgdiv' id='susimglist' ></div><br>"
+    +"<button id='confirmpinfobt'  class='swsubmit' value='submit' style='width: 290px;height: 45px; margin:5px auto 10px;display:block;'>SUBMIT</button>";
     var openbutton= document.getElementById("swopenbt");
     var  openconfirm=document.createElement("script");
     openconfirm.innerHTML="function openConfrim(id){"+"if(id.name==\"OFF\"){id.name=\"ON\";id.innerHTML=\"pick up  web ON\";id.style.background=\"#61CE3C\";}else{id.name=\"OFF\";id.innerHTML=\"pick up  web OFF\";id.style.background=\"#BD2D30\";}}";
      suspensionWindow.appendChild(openconfirm);
 
-    var suspensionwindowStyleContent="#suspensionwindow{width:350px;background:rgba(0,0,0,0.6);color:#fff;position:fixed;right:10px;top:60px;font:400 12px/1.2 Helvetica;overflow:hidden;z-index:99999;border-radius:5px;padding:5px;margin: 0 0 0 5px;max-height:90vh;overflow-Y:auto;}";
-    suspensionwindowStyleContent+="#suspensionwindow .line{overflow:hidden;margin-bottom:10px;}";
-    suspensionwindowStyleContent+="#suspensionwindow button{width:50px;height:18px;left:5px; line-height:18px;background:#f47737;color:#fff;border-radius:4px;margin-left:5px;border:none; padding:0;margin:0 0 0 5px;}";
-    suspensionwindowStyleContent+="#suspensionwindow p.sw{width:160px;float:left;text-align:left;margin:0;line-height:18px;}";
-    suspensionwindowStyleContent+="#suspensionwindow input{width:120px;float:left;border:none;color:#000000;padding:0;margin: 0 0 0 5px;}";
+    var suspensionwindowStyleContent="#suspensionwindow{width:380px;background:rgba(0,0,0,0.6);color:#fff;position:fixed;right:10px;top:60px;left:auto; font:400 12px/1.2 Helvetica;overflow:hidden;z-index:99999;border-radius:5px;padding:5px;margin: 0 0 0 5px;max-height:75vh;overflow-Y:auto;}";
+    suspensionwindowStyleContent+="#suspensionwindow .swline{overflow:hidden;margin-bottom:10px;}";
+    suspensionwindowStyleContent+="#suspensionwindow button{width:50px;height:22px;left:5px; line-height:18px;background:#f47737;color:#fff;border-radius:4px;margin-left:5px;border:none; padding:0;margin:0 0 0 5px;}";
+    suspensionwindowStyleContent+="#suspensionwindow p.sw{color:white;width:160px;float:left;text-align:left;margin:0;line-height:18px;}";
+    suspensionwindowStyleContent+="#suspensionwindow input{width:120px;height:22px;float:left;border:none;color:#000000;padding:0;margin: 0 0 0 5px;}";
     suspensionwindowStyleContent+="#suspensionwindow .swimgdiv{width:100%;overflow:hidden;}";
     suspensionwindowStyleContent+="#suspensionwindow .swimg-item{float:left;padding:2px;border:1px solid #fff;text-align:center;width:20%;}";
     suspensionwindowStyleContent+="#suspensionwindow .swimg{width:40px;height:40px;margin:5px;vertical-align:middle;cursor:pointer;}";
@@ -308,7 +319,7 @@ function ShowInputWindow(state) {
     }
     else {
         button.setAttribute("name","OFF");
-        susdiv.style.maxHeight="90vh";
+        susdiv.style.maxHeight="75vh";
         susdiv.style.height="";
          susdiv.style.overflowY="auto";
     }
@@ -317,7 +328,7 @@ function ShowInputWindow(state) {
 
 }
 
-
+    startDrag(document.getElementById("swisupbt"),suspensionWindow);
 }
 
 //---------------------------事件方法-----------------
@@ -333,8 +344,6 @@ function   inputGetfocus(e)
 {
 
     currentinputid= e.target.id;
-
-
 
 }
 
@@ -361,6 +370,8 @@ function  clearContent(id)
     if(input.localName=="textarea")
     {
         input.previousElementSibling.value="";
+        var textarea=input.previousElementSibling;
+        textarea.setAttribute("xpath","[");
     }
 
 }
@@ -383,22 +394,13 @@ function  clearImgContent(id)
             }
             else
             {
+                delete allimgJsonArray[imglist[i].src];
                 imgDiv.removeChild(imglist[i].parentNode);
 
             }
 
         }
-       // var imgAlllist=imgDiv.getElementsByTagName("img");
-       // var  allimglist=imgDiv.getElementsByTagName("img")
-       // if(allimglist.length>=5) {
-       //     imgDiv.style.height = ((allimglist.length - (allimglist.length%5))/5+ 2) * 50 + "px";
-       // }
-       // else
-       // {
-       //     imgDiv.style.height ="50px";
-       // }
-       // var suspensionWindow=document.getElementById("suspensionwindow");
-       // suspensionWindow.style.height=(Number(imgDiv.style.height)+350)+"px";
+
 
     }
 
@@ -408,45 +410,35 @@ function  clearImgContent(id)
 // 清空单张图片内容
 function clearSingleImg(id)
 {
+
+    delete allimgJsonArray[id.target.src];
     var suspensionWindow=document.getElementById("suspensionwindow");
     var imgDiv=document.getElementById("susimglist");
     imgDiv.removeChild(id.target.parentNode);
-
-    var  allimglist=imgDiv.getElementsByTagName("img")
-   // if(allimglist.length>=5) {
-   //     imgDiv.style.height = ((allimglist.length - (allimglist.length%5))/5+ 2) * 50 + "px";
-   // }
-   // else
-   // {
-   //     imgDiv.style.height ="50px";
-   // }
-   //
-   // var submitbt=document.getElementById("confirmpinfobt");
-   //
-   //
-   //// suspensionWindow.insertBefore(imgDiv,submitbt);
-   ////suspensionWindow.style.height=(Number(imgDiv.style.height)+350)+"px";
-   // suspensionWindow.clientHeight=imgDiv.clientHeight+350;
-
-
-
 
 }
 
 // 提交内容
 function  submitContent(id)
 {
+     if(isspecialURL)
+     {
+         var categoryValue=document.getElementById("swinput1").value;
+         var datastr={website:{value:window.location.href,name:"website"},category:{value:categoryValue,name:"category"},has_spider:true};
+         sendHasSpiderDataToserver(JSON.stringify(datastr));
+
+         return;
+     }
+
+
+
+
+
       var submitbt=id.target;
-     var list=new Array();
-    dataArray[0][0]="website";
-    dataArray[0][1]=window.location.href;
-    dataArray[0][2]="";
-
-     // textarea  传递
-
-
-    // textarea 传递
-
+      var list=new Array();
+      dataArray[0][0]="website";
+      dataArray[0][1]=window.location.href;
+      dataArray[0][2]="";
 
 
     var fromList=document.getElementById("suspensionwindow").getElementsByTagName("input");
@@ -472,37 +464,47 @@ function  submitContent(id)
               dataArray[i][1]=String(fromList[i].value);
               dataArray[i][2]=fromList[i].getAttribute("xpath");
 
-
-
         }
     }
-      dataArray[4][1]=document.getElementById("swdestextarea").value;
+    dataArray[4][1]=document.getElementById("swdestextarea").value;
     dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath").replace(/,$/gi,"")+"]";
 
-
-
-
-            // list[i-1]=fromList[i].value.toString();
     var imglist=document.getElementById("suspensionwindow").getElementsByTagName("img");
     if(imglist.length<=0)
     {
-        alert("图片不能为空 ");
-        return false;
+       // alert("图片不能为空 ");
+       // return false;
 
     }
-    var jsonstring="["
+    var jsonstring="[";
     if(imglist.length<=0)
     {
-               jsonstring="]"
+               jsonstring="]";
     }
     else
     {
-        for (var i = 0; i < imglist.length - 1; i++) {
+        for (var i = 0; i < imglist.length; i++) {
 
-            jsonstring += "{\"xpath\":\"" + imglist[i].name.replace(/\"/g, "'") + "\",\"src\":\"" + imglist[i].src + "\"},";
+            if(imglist[i].nextElementSibling.name.toString()=="markon") {
+                jsonstring += "{\"xpath\":\"" + imglist[i].name.replace(/\"/g, "'") + "\",\"src\":\"" + imglist[i].src + "\"},";
+                clickactiontargetxpathlist[imglist[i].name]=false;
+            }
 
         }
-        jsonstring += "{\"xpath\":\"" + imglist[imglist.length - 1].name.replace(/\"/g, "'") + "\",\"src\":\"" + imglist[imglist.length - 1].src + "\"}]";
+        if(jsonstring.length>5){
+            jsonstring=jsonstring.substring(0,jsonstring.length-1);
+
+
+        }
+        else
+        {
+             alert("图片不能为空 ");
+             return false;
+
+        }
+
+
+             jsonstring+="]";
 
 
 
@@ -531,20 +533,32 @@ function  submitContent(id)
                 sendstring+="\""+array[0]+"\":{"+"\"value\":\""+array[1]+"\",\"xpath\":\""+array[2].replace(/\"/g,"'")+"\"},"
             }
 
-            sendstring+="\"images\":"+jsonstring+"}";
+            sendstring+="\"images\":"+jsonstring+",\"has_spider\":false}";
             console.log(sendstring);
          // alert(sendstring);
+          var isSure=window.confirm("亲,您确定提交嘛?");
+           if(!isSure)
+           {
+               return;
+           }
+
+
+
       var imgUrlList=new Array();
     for (var i = 0; i < imglist.length; i++) {
-              imgUrlList[i]=imglist[i].src;
+        if(imglist[i].nextElementSibling.name.toString()=="markon") {
+            imgUrlList.push(imglist[i].src);
+        }
     }
              //  sendDataToserver(sendstring)
             document.getElementById("swuploadat").style.display="";
-            chrome.runtime.sendMessage({getState:"submit",data:sendstring,imgData:imgUrlList,url:window.location.href},function(response)
+            document.getElementById("swuploadat").innerText="LOADING";
+            var collectionName=document.getElementById("swinput1").value;
+            chrome.runtime.sendMessage({getState:"submit",data:sendstring,imgData:imgUrlList,url:window.location.href,tacitcn:collectionName,hasspider:"false",clickactiondata:clickactionlist,imgxpaths:clickactiontargetxpathlist},function(response)
             {
                 if(response.code.toString()=="200")
                 {
-                    alert("数据正在提交中,请您耐心等待结果...");
+                    //alert("数据正在提交中,请您耐心等待结果...");
 
                     clearALLContent();
 
@@ -560,23 +574,20 @@ function  submitContent(id)
 
 // 数据完整发送到服务器
 
-function  sendDataToserver(datastr)
+// 有爬虫发送的数据
+function  sendHasSpiderDataToserver(datastr)
 {
-    chrome.runtime.sendMessage({getState:"submit",data:sendstring,url:window.location.href},function(response)
+    document.getElementById("swuploadat").style.display="";
+    document.getElementById("swuploadat").innerText="LOADING";
+    var collectionName=document.getElementById("swinput1").value;
+    chrome.runtime.sendMessage({getState:"submit",data:datastr,url:window.location.href,hasspider:"true",tacitcn:collectionName},function(response)
     {
         if(response.code.toString()=="200")
         {
             //alert("添加成功");
             clearALLContent();
-
-
         }
-
     });
-
-
-
-
 }
 
 
@@ -585,7 +596,7 @@ function  sendDataToserver(datastr)
 function clearALLContent()
 {
     var fromList=document.getElementById("suspensionwindow").getElementsByTagName("input");
-    for (var i=1 ;i<fromList.length ;i++)
+    for (var i=2 ;i<fromList.length ;i++)
     {
 
         if(fromList[i].value.toString().length<=0)
@@ -596,16 +607,16 @@ function clearALLContent()
         else
         {
             fromList[i].value="";
-            fromList[i].setAttribute("xpath","NULL");
+            fromList[i].setAttribute("xpath","");
             dataArray[i][1]="NULL";
             dataArray[i][2]="NUll";
 
         }
     }
 
-     var textarea=document.getElementById("swdestextarea");
+    var textarea=document.getElementById("swdestextarea");
       textarea.value="";
-      textarea.setAttribute("xpath","NULL");
+      textarea.setAttribute("xpath","[");
 
     var imgDiv=document.getElementById("susimglist");
 
@@ -613,10 +624,12 @@ function clearALLContent()
     //rootDIV.style.height="350px";
     // imgDiv.parentNode.removeChild(imgDiv);
     var imglist=imgDiv.getElementsByTagName("img");
+    allimgJsonArray={};
     if(imglist.length>0) {
         for (var i = imglist.length - 1; i >= 0; i--) {
 
             imgDiv.removeChild(imglist[i].parentNode);
+            allimgJsonArray={};
 
 
 
@@ -651,59 +664,34 @@ function openConfrimD(e){
 
 }
 
-
-
 // --------------------数据通信 -------------------
-//chrome.runtime.onMessage.addListener(function (request,sender,sendResponse) {
-//
-//        if(request.state=="true")
-//        {
-//            ShowInputWindow(true);
-//
-//
-//        }
-//        else if(request.state=="false")
-//        {
-//            ShowInputWindow(false);
-//        }
-//
-//
-//        if(request.uploadstate!=null)
-//        {
-//            if(request.uploadstate="true")
-//            {
-//                document.getElementById("swuploadat").style.display="none";
-//
-//
-//            }
-//
-//
-//
-//        }
-//
-//        sendResponse({code:"200"});
-//
-//    }
-//);
-
-
 chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
 
     if(request.state=="true")
     {
         ShowInputWindow(true);
+        if(request.tacitcn!=null) {
+            document.getElementById("swinput1").value = request.tacitcn;
+        }
 
 
     }
     else if(request.state=="false")
     {
         ShowInputWindow(false);
+        if(request.tacitcn!=null) {
+            document.getElementById("swinput1").value = request.tacitcn;
+        }
     }
+
+
 
 
     if(request.uploadstate!=null)
     {
         document.getElementById("swuploadat").style.display="none";
+        document.getElementById("swuploadat").innerText="LOADING";
+
         if(request.uploadstate="true")
         {
 
@@ -724,16 +712,107 @@ chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
 }
 );
 
-chrome.runtime.sendMessage({getState:"state"},function(response)
+chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname},function(response)
 {
      if(response.state)
      {
          ShowInputWindow(true);
+
+         document.getElementById("swinput1").value=response.tacitcnb;
+
      }
     else
      {
          ShowInputWindow(false);
      }
+     if(response.clickactiondata.length>0)
+     {
+         console.log("-----clickaction----"+response.clickactiondata+"-----clickaction----");
+
+         var jsrunstr='function getImgList(){ var dispatchMouseEvent =function(target, var_args) {'
+             +'var e = document.createEvent("MouseEvents");'
+             +'e.initEvent.apply(e, Array.prototype.slice.call(arguments,1));'
+             +'target.dispatchEvent(e);}; var imgResultList=[];var avoidRepeatImg={};';
+         var imgxpathlist=response.clickactiontargetxpathlist;
+         jsrunstr+='var imgxpathlist='+JSON.stringify(imgxpathlist)+';';
+         jsrunstr+='var clickactiondata='+JSON.stringify(response.clickactiondata)+';';
+         jsrunstr+='for(var i=0;i<clickactiondata.length;i++){';
+         jsrunstr+=' var elementStr=$x(\'\'+clickactiondata[i]+\'\')[0];';
+         jsrunstr+='if(elementStr==null){continue;}'
+         jsrunstr+='dispatchMouseEvent(elementStr, \'mouseover\', true, true);';
+         jsrunstr+='dispatchMouseEvent(elementStr, \'mousedown\', true, true);';
+         jsrunstr+='dispatchMouseEvent(elementStr, \'click\', true, true);';
+         jsrunstr+='dispatchMouseEvent(elementStr, \'mouseup\', true, true);';
+
+         jsrunstr+='for( key  in imgxpathlist)'
+             +'{'
+             +'var targetImg=getNodesByxpath(""+key+"")[0];'
+             +'if(targetImg!=null){'
+             +'console.log("成功:图片的src=" + targetImg.src);'
+             +'if(!avoidRepeatImg[targetImg.src])'
+             +'{imgResultList.push(targetImg.src);avoidRepeatImg[targetImg.src]=true;  }'
+             +'}'
+             +'else'
+             +' {'
+             +'   console.log(\"失败:\"+targetImg);'
+             +'  }'
+             +'}'
+         +'}';
+
+         for(var i=0;i<response.clickactiondata.length;i++) {
+
+             var element = getNodesByxpath('' + response.clickactiondata[i] + '', document)[0];
+             if (element != null) {
+
+
+
+                 var dispatchMouseEvent = function(target, var_args) {
+                     var e = document.createEvent("MouseEvents");
+                     e.initEvent.apply(e, Array.prototype.slice.call(arguments, 1));
+                     target.dispatchEvent(e);
+                 };
+                 dispatchMouseEvent(element, 'mouseover', true, true);
+                 dispatchMouseEvent(element, 'mousedown', true, true);
+                 dispatchMouseEvent(element, 'click', true, true);
+                 dispatchMouseEvent(element, 'mouseup', true, true);
+                 var numsort=0;
+                 for( key  in imgxpathlist)
+                 {
+                     numsort++;
+                     console.log('正在获取第'+numsort+'张图片,xpath:'+key);
+                    var targetImg=getNodesByxpath(''+key+'')[0];
+                     if(targetImg!=null) {
+                         console.log("成功:图片的src=" + targetImg.src);
+                     }
+                     else
+                     {
+                          console.log("失败:"+targetImg);
+                     }
+
+                 }
+
+               //console.log('$x(\''+response.clickactiondata[i]+'\')[0].dispatchEvent(new Event("mouse"))');
+             }
+         }
+          jsrunstr+=' return  imgResultList ;}';
+         console.log("___________模拟点击 \n"+jsrunstr);
+     }
+
+    //
+    if(response.isspecialurl)
+    {
+         console.log("此网站已经有自动分析程序,仅填写分类即可提交产品!");
+        document.getElementById("swuploadat").innerText="此网站已经有自动分析程序,仅填写分类即可提交产品!";
+        document.getElementById("swuploadat").style.display="";
+        isspecialURL=true;
+    }
+    else
+    {
+        isspecialURL=false;
+
+    }
+
+
 
 });
 
@@ -784,6 +863,28 @@ function  analyseBodyImg(e)
 
 }
 
+/////图片去重
+function avoidRepetitionImg(list)
+{
+    var n={},r=[];
+
+    for(var i=0;i<list.length;i++)
+    {
+        if(!r[list[i].src])
+        {
+             n[list.src]=true;
+            r.push(list[i]);
+        }
+
+
+    }
+    console.log("去掉了:"+(list.length- r.length));
+    return  r;
+
+}
+
+
+// 分析含有 图片的节点
 
 function  analyseImgElemente(e)
 {
@@ -796,54 +897,102 @@ function  analyseImgElemente(e)
          imgDiv.id="susimglist";
          var submitbt=document.getElementById("confirmpinfobt");
          //suspensionWindow.insertBefore(imgDiv,submitbt);
-            submitbt.parentNode.insertBefore(imgDiv,submitbt.previousElementSibling);
+         if(submitbt!=null) {
+             suspensionWindow.insertBefore(imgDiv, submitbt.previousElementSibling);
+         }
+         else
+         {
+             return false;
+         }
      }
      var  ppnode=getNodeWhoseChildsAreMore(e);
      var imgListSet=ppnode.getElementsByTagName("img");
-      var imgList=sortImglist(imgListSet);
+    if(imgListSet.length<=0)
+    {
+        return false;
+    }
+   //先去重后排序
+     var imgList=sortImglist(avoidRepetitionImg(imgListSet));
+
+    //当前可选图片的数组
+   //  var displayImgList=imgDiv.getElementsByTagName("img");
+
 
 
     for(var i=0;i<imgList.length;i++)
     {
-        if(imgList[i].className=="swimg")
+
+        if(imgList[i].className=="swimg"||parseFloat(imgList[i].naturalHeight)<102.0||parseFloat(imgList[i].naturalWidth)<102.0)
         {
              continue;
         }
+        if(allimgJsonArray[imgList[i].src])
+        {
+            continue;
+        }
+        allimgJsonArray[imgList[i].src]=true;
+
         var img=document.createElement("img");
         var img_c=document.createElement("div");
         var img_des=document.createElement("p");
-        //img_des.style.backgroundColor="#000000";
-        //img_des.style.color="#FFFFFF";
         img_des.className="swimgdes";
         img_des.textContent=imgList[i].naturalWidth+" X "+imgList[i].naturalHeight;
+        img.setAttribute("area",""+parseFloat(imgList[i].naturalWidth)*parseFloat(imgList[i].naturalHeight)+"");
         img_des.textAlign="center";
         img_des.name="markoff";
         img_c.appendChild(img);
         img_c.appendChild(img_des);
         img_c.className="swimg-item";
-        //img_c.style.cssText="float:left;margin:2px;border:1px solid #ddd;padding:2px;";
         img.className="swimg";
-
-        //img.style.width="40.5px";
-        //img.style.height=img.style.width;
-        //img.style.margin="5px";
         img.src=imgList[i].src;
         img.name=getPathTo(imgList[i]);
-        imgDiv.appendChild(img_c);
+
+        //当前可选图片的数组
+        var displayImgList=imgDiv.getElementsByTagName("img");
+
+        if(displayImgList.length==0)
+        {
+            imgDiv.appendChild(img_c);
+        }
+        else
+        {
+            for(var b=0;b<displayImgList.length;b++)
+            {
+                //if(displayImgList[b].nextElementSibling.name=="markon")
+                //{
+                //    if(b==(displayImgList.length-1))
+                //    {
+                //        imgDiv.appendChild(img_c);
+                //        break;
+                //
+                //    }
+                //    continue;
+                //
+                //}
+                var a=parseFloat(img.getAttribute("area"));
+                var d=parseFloat(displayImgList[b].getAttribute("area"));
+                if(a>=d&&displayImgList[b].nextElementSibling.name!="markon")
+                {
+
+                    imgDiv.insertBefore(img_c,displayImgList[b].parentNode);
+                    break;
+                }
+                if(b==displayImgList.length-1){
+                    imgDiv.appendChild(img_c);
+                }
+
+            }
+
+
+        }
+
+
+        //  imgDiv.appendChild(img_c);
         img.addEventListener("click",clearSingleImg,false);
         img_des.addEventListener("click",changeImgMarkState,false)
     }
 
-  //var  allimglist=imgDiv.getElementsByTagName("img")
-  //  if(allimglist.length>=5) {
-  //      imgDiv.style.height = ((allimglist.length - (allimglist.length%5))/5+ 2) * 50 + "px";
-  //  }
-  //  else
-  //  {
-  //      imgDiv.style.height ="50px";
-  //  }
-  //
-  //  suspensionWindow.style.height=(Number(imgDiv.style.height)+350)+"px";
+   return true;
 
 }
 
@@ -863,13 +1012,11 @@ function  changeImgMarkState(e)
         pnode.name="markoff";
     }
 
-
-
 }
 
 
 
-
+// 分析节点
 function analyseElement(e)
 {
 
@@ -886,7 +1033,8 @@ function analyseElement(e)
 
 
 
-    var xpath=getPathTo(e.target);
+
+         var xpath=getPathTo(e.target)
     var currentE=document.getElementById(currentinputid);
     if(currentE==null)
     {
@@ -913,6 +1061,7 @@ function analyseElement(e)
         if(currentE.localName=="textarea")
         {
               var fxpath=currentE.getAttribute("xpath");
+
               fxpath=fxpath+"\""+xpath+"\""+",";
               currentE.setAttribute("xpath",fxpath);
         }
@@ -941,7 +1090,11 @@ function analyseElement(e)
 
 
 function getPathTo(element) {
-    if (element.id!=='')
+    if(element==null)
+    {
+        return "";
+    }
+    if (element.id!='')
         return 'id("'+element.id+'")';
     if (element===document.body)
         return element.tagName;
@@ -1038,8 +1191,7 @@ function analyseADDNode(e)
     }
     else  if(e.type== "DOMNodeInserted")
     {
-        listenADDnodeImg(false);
-        listenADDnodeImg(true);
+
 
 
 
@@ -1047,47 +1199,179 @@ function analyseADDNode(e)
 }
 
 
-
+var MutationObserver=window.MutationObserver||WebKitMutationObserver || window.MozMutationObserver
+var mutaObserver;
 //  开启 关闭  自动监听
 function listenADDnodeImg(state)
 {
    if(state) {
-       document.addEventListener("DOMNodeInserted",analyseADDNode,false);
 
-       document.addEventListener("DOMAttrModified",analyseADDNode,false);
+       if(mutaObserver!=null)
+       {
+           var config = { attributes: true, childList: true,subtree:true, characterData: false };
+           mutaObserver.observe(document.body,config);
+       }
 
 
+
+       mutaObserver=new MutationObserver(function(mutations)
+       {
+           console.log(mutations);
+           analyseDomChange(mutations);
+       });
+       var config = { attributes: true, childList: true,subtree:true,characterData:false};
+       mutaObserver.observe(document.body,config);
    }
     else
    {
-        document.removeEventListener("DOMNodeInserted",analyseADDNode,false);
-        document.removeEventListener("DOMAttrModified",analyseADDNode,false);
 
-
+        mutaObserver.disconnect();
    }
 
 
-
-
 }
-//------------------------ 鼠标 拖动
+// 开启监听
+listenADDnodeImg(true);
 
-var xl;
-var yl;
-function  moveSWDIV(e)
+// 分析节点的变化 并进行响应的动作
+
+function  analyseDomChange(mutations)
 {
-    // e=e||window.event;
-    //var x=e.clientX; //鼠标移动时获取x轴坐标
-    //var y=e.clientY; //鼠标移动时获取y轴坐标
-    //
-    //e.target.style.left +=(xl-x)+"px";//将移动后的坐标赋给相应的位移
-    //e.target.style.top += (yl-y)+"px";
-    //xl= e.clientX;
-    //yl= e.clientY;
+     for(var i=0; i<mutations.length;i++)
+     {
 
+         if(mutations[i].target.className.indexOf("sw")>0)
+         {
+             return;
+         }
+       var mutationRecord=mutations[i];
+         if(mutationRecord.addedNodes!=null&&mutationRecord.type=="childList")
+         {
+             var nodelist=mutationRecord.addedNodes;
+              var onceDo=true;
+             if(nodelist.length>0) {
+                 for(var b=0;b<nodelist.length;b++) {
+
+                     //if(nodelist[b].className.indexOf("sw")>0)
+                     //{
+                     //    return;
+                     //}
+                    result= analyseImgElemente(nodelist[b]);
+                     if(result&&onceDo)
+                     {
+                         var xpath=getPathTo(currentElement);
+                         if(xpath!="") {
+                             clickactionlist.push(xpath);
+                             currentElement=null;
+                             onceDo = false;
+                         }
+                     }
+                 }
+             }
+
+
+         }else if(mutationRecord.type=="attributes")
+         {
+             if(mutationRecord.attributeName=="src") {
+                 var ce=mutationRecord.target.parentNode;
+                 if(ce.className=="swimg-item"){
+                    return;
+                 }
+                 else
+                 {
+
+                     var xpath=getPathTo(currentElement);
+                     if(xpath!="") {
+                         clickactionlist.push(xpath);
+                         onceDo = false;
+                         currentElement=null;
+                     }
+
+
+                     analyseImgElemente(mutationRecord.target);
+                 }
+             }
+         }
+
+
+
+     }
 
 
 }
+
+
+
+
+
+
+
+// ------------------------ 监听分析-------------------------
+//------------------------ 鼠标 拖动-------------------------
+
+//------------------------ 鼠标 拖动S----------------------
+
+var params = {
+    left: 0,
+    top: 0,
+    currentX: 0,
+    currentY: 0,
+    flag: false
+};
+//获取相关CSS属性
+
+var getCss = function(o,key){
+    return o.currentStyle? o.currentStyle[key] : document.defaultView.getComputedStyle(o,false)[key];
+};
+
+function startDrag(bar, target, callback){
+    if(getCss(target, "left") !== "auto") {
+        params.left = getCss(target, "left");
+    }else{
+        params.left=target.offsetLeft;
+    }
+    if(getCss(target, "top") !== "auto"){
+        params.top = getCss(target, "top");
+    }
+    //o是移动对象
+    bar.onmousedown = function(event){
+        params.flag = true;
+        if(!event){
+            event = window.event;
+            //防止IE文字选中
+            bar.onselectstart = function(){
+                return false;
+            }
+        }
+        var e = event;
+        params.currentX = e.clientX;
+        params.currentY = e.clientY;
+    };
+    document.onmouseup = function(){
+        params.flag = false;
+        if(getCss(target, "left") !== "auto"){
+            params.left = getCss(target, "left");
+        }
+        if(getCss(target, "top") !== "auto"){
+            params.top = getCss(target, "top");
+        }
+    };
+    document.onmousemove = function(event){
+        var e = event ? event: window.event;
+        if(params.flag){
+            var nowX = e.clientX, nowY = e.clientY;
+            var disX = nowX - params.currentX, disY = nowY - params.currentY;
+            target.style.left = parseInt(params.left) + disX + "px";
+            target.style.top = parseInt(params.top) + disY + "px";
+        }
+
+        if (typeof callback == "function") {
+            callback(parseInt(params.left) + disX, parseInt(params.top) + disY);
+        }
+    }
+};
+
+
 
 
 // 其他方法
@@ -1158,4 +1442,122 @@ function strDealJsonvalueReplace(v) {
 
 function getRidOfDupWhitespace(content) {
     return content.replace(/\s\s\s*/g,' ');
+}
+
+//根据指定的XPATH表达式查找满足条件的所有节点
+//@param xmldoc 执行查找的节点
+//@param sXpath xpath的表达式
+function selectNodes(xmldoc,sXpath){
+
+    if(window.ActiveXObject){
+        //IE浏览器
+        return xmldoc.selectNodes(sXpath);
+    }else if(window.XPathEvaluator){
+        //FireFox类浏览器
+        var xpathObj=new XPathEvaluator();
+
+        if(xpathObj){
+            var result=xpathObj.evaluate(sXpath,xmldoc,null,XPathResult.ORDERED_NODE_ITEARTOR_TYPE,null);
+            var nodes=new Array();
+            var node;
+            while((node = result.iterateNext())!=null) {
+                nodes.push(node);
+            }
+            return nodes;
+
+        }else{
+
+            return null;
+        }
+
+    }else{
+        return null;
+    }
+}
+
+
+// 根据路径获取  节点
+
+function  getNodesByxpath(xpath, context)
+{
+    var doc = (context && context.ownerDocument)||document;
+    var result = doc.evaluate(xpath, context || doc, null, XPathResult.ANY_TYPE, null);
+    switch (result.resultType) {
+        case XPathResult.NUMBER_TYPE:
+            return result.numberValue;
+        case XPathResult.STRING_TYPE:
+            return result.stringValue;
+        case XPathResult.BOOLEAN_TYPE:
+            return result.booleanValue;
+        default:
+            var nodes = [];
+            var node;
+            while (node = result.iterateNext())
+                nodes.push(node);
+            return nodes;
+    }
+}
+
+
+//
+
+function simulateAction(element, eventName)
+{
+    var options = extend(defaultOptions, arguments[2] || {});
+    var oEvent, eventType = null;
+
+    for (var name in eventMatchers)
+    {
+        if (eventMatchers[name].test(eventName)) { eventType = name; break; }
+    }
+
+    if (!eventType)
+        throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
+
+    if (document.createEvent)
+    {
+        oEvent = document.createEvent(eventType);
+        if (eventType == 'HTMLEvents')
+        {
+            oEvent.initEvent(eventName, options.bubbles, options.cancelable);
+        }
+        else
+        {
+            oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
+                options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
+                options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
+        }
+        element.dispatchEvent(oEvent);
+    }
+    else
+    {
+        options.clientX = options.pointerX;
+        options.clientY = options.pointerY;
+        var evt = document.createEventObject();
+        oEvent = extend(evt, options);
+        element.fireEvent('on' + eventName, oEvent);
+    }
+    return element;
+}
+
+function extend(destination, source) {
+    for (var property in source)
+        destination[property] = source[property];
+    return destination;
+}
+
+var eventMatchers = {
+    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
+    'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
+}
+var defaultOptions = {
+    pointerX: 0,
+    pointerY: 0,
+    button: 0,
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    metaKey: false,
+    bubbles: true,
+    cancelable: true
 }

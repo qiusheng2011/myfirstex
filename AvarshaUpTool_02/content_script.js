@@ -8,13 +8,18 @@ var globalState=false;
 //
 var currentinputid="none";
 
-var allimgJsonArray={};
+var   allimgJsonArray={};
 
-var isspecialURL=false;
+var  isspecialURL=false;
 
+var currentMD5="";
 // 记录当前 点击目标
 var currentElement="";
+
 var clickactionlist=[];
+var clickactiontargetxpathlist={};
+
+
 
 
 
@@ -151,7 +156,6 @@ function  clickElement(e)
         {
 
 
-
             if(e.target.id=="suspensionwindow"|| e.target.className.indexOf("sw")>=0)
             {
                 if(e.target.className=="swsusclearbt")
@@ -237,15 +241,15 @@ function ShowInputWindow(state) {
      var currentTabUrl=window.location.href;
 
 
-    suspensionWindow.innerHTML="<p class='swat' id='swuploadat1' style='font-size: 25px;color: #BD2D30;display:none'>loading</p><div class='sw swline' style='text-align:center'><button class='sw'  id='swopenbt' type=\"button\" name=\"OFF\" value=\"pick up  web OFF\" onclick='openConfrim(this)' style=\"background:#BD2D30;text-align:center;width:auto;padding:0 20px;margin:0 auto;\">pick up  web OFF </button><button class='sw'  id='swisupbt' type=\"button\" name=\"OFF\" >ISUP</button></div>"
-        +"<div class='sw swline'><p class='swat' id='swuploadat' style='font-size: 25px;color: #BD2D30;display:none'>loading</p></div>"
-        +"<div class='sw swline'><p class='sw'><strong  class='sw'>网站地址【website】:</strong></p><input class='swiput' type=\"text\" name='website' value='"+ currentTabUrl+"' ><button disabled='disabled'style='background:#333333;' class='swsusclearbt'>clear</button></div>"
-        +"<div class='sw swline'><p class='sw'><strong  class='sw'>分类【CollectionName】:</strong></p><input class='sw' type=\"text\" id='swinput1' name='category' dropzone=value /><button class='swsusclearbt' >clear</button></div>"
-        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品名称【ProductName】:</strong></p> <input class='sw' type=\"text\"  id='swinput2' name='productname' /><button class='swsusclearbt'>clear</button> </div>"
-        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品价格【Price】:</strong></p><input class='sw' type=\"text\" name='price' id='swinput3'  /><button class='swsusclearbt'  >clear</button></div>"
-        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' xpath='[' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
-        +"<div class='sw swline'><p class='sw'><strong  class='sw'>产品图片【Product Img】:</strong></p><button id='swsusallbtimg' class='swsusallbtimg'   >allImg</button><button id='swsusclearbtimg' class='swsusclearbtimg'>clear</button></div>"
-        +"<div class='swimgdiv' id='susimglist' ></div><br>"
+    suspensionWindow.innerHTML="<p class='swat' id='swuploadat1' style='font-size: 25px;color: #BD2D30;display:none'>loading</p><div class='sw1 swline' style='text-align:center'><button class='sw'  id='swopenbt' type=\"button\" name=\"OFF\" value=\"pick up  web OFF\" onclick='openConfrim(this)' style=\"background:#BD2D30;text-align:center;width:auto;padding:0 20px;margin:0 auto;\">pick up  web OFF </button><button class='sw'  id='swisupbt' type=\"button\" name=\"OFF\" >ISUP</button></div>"
+        +"<div class='sw1 swline'><p class='swat' id='swuploadat' style='font-size: 25px;color: #BD2D30;display:none'>loading</p></div>"
+        +"<div class='sw1 swline'><p class='swg'><strong  class='swg'>网站地址【website】:</strong></p><input class='swiput' type=\"text\" name='website' value='"+ currentTabUrl+"' ><button disabled='disabled'style='background:#333333;' class='swsusclearbt'>clear</button></div>"
+        +"<div class='sw1 swline'><p class='swg'><strong  class='swg'>分类【CollectionName】:</strong></p><input class='sw' type=\"text\" id='swinput1' name='category' dropzone=value /><button class='swsusclearbt' >clear</button></div>"
+        +"<div class='sw1 swline'><p class='swg'><strong  class='swg'>产品名称【ProductName】:</strong></p> <input class='sw' type=\"text\"  id='swinput2' name='productname' /><button class='swsusclearbt'>clear</button> </div>"
+        +"<div class='sw1 swline'><p class='swg'><strong  class='swg'>产品价格【Price】:</strong></p><input class='sw' type=\"text\" name='price' id='swinput3'  /><button class='swsusclearbt'  >clear</button></div>"
+        +"<div class='sw1 swline'><p class='swg'><strong  class='swg'>产品描述【Descript】:</strong></p><textarea class='swtextarea' id='swdestextarea' xpath='[' style='color: black' ></textarea><button class='swsusclearbt'  >clear</button> </div>"
+        +"<div class='sw1 swline'><p class='swg'><strong  class='swg'>产品图片【Product Img】:</strong></p><button id='swsusallbtimg' class='swsusallbtimg'   >allImg</button><button id='swsusclearbtimg' class='swsusclearbtimg'>clear</button></div>"
+        +"<br>"
     +"<button id='confirmpinfobt'  class='swsubmit' value='submit' style='width: 290px;height: 45px; margin:5px auto 10px;display:block;'>SUBMIT</button>";
     var openbutton= document.getElementById("swopenbt");
     var  openconfirm=document.createElement("script");
@@ -255,7 +259,8 @@ function ShowInputWindow(state) {
     var suspensionwindowStyleContent="#suspensionwindow{width:380px;background:rgba(0,0,0,0.6);color:#fff;position:fixed;right:10px;top:60px;left:auto; font:400 12px/1.2 Helvetica;overflow:hidden;z-index:99999;border-radius:5px;padding:5px;margin: 0 0 0 5px;max-height:75vh;overflow-Y:auto;}";
     suspensionwindowStyleContent+="#suspensionwindow .swline{overflow:hidden;margin-bottom:10px;}";
     suspensionwindowStyleContent+="#suspensionwindow button{width:50px;height:22px;left:5px; line-height:18px;background:#f47737;color:#fff;border-radius:4px;margin-left:5px;border:none; padding:0;margin:0 0 0 5px;}";
-    suspensionwindowStyleContent+="#suspensionwindow p.sw{color:white;width:160px;float:left;text-align:left;margin:0;line-height:18px;}";
+    suspensionwindowStyleContent+="#suspensionwindow p.swg{color:white;width:160px;float:left;text-align:left;margin:0;line-height:18px;}";
+    suspensionwindowStyleContent+="#suspensionwindow strong.swg{color:white;}";
     suspensionwindowStyleContent+="#suspensionwindow input{width:120px;height:22px;float:left;border:none;color:#000000;padding:0;margin: 0 0 0 5px;}";
     suspensionwindowStyleContent+="#suspensionwindow .swimgdiv{width:100%;overflow:hidden;}";
     suspensionwindowStyleContent+="#suspensionwindow .swimg-item{float:left;padding:2px;border:1px solid #fff;text-align:center;width:20%;}";
@@ -464,7 +469,7 @@ function  submitContent(id)
 
         }
     }
-    dataArray[4][1]=document.getElementById("swdestextarea").value;
+      dataArray[4][1]=document.getElementById("swdestextarea").value;
     dataArray[4][2]=document.getElementById("swdestextarea").getAttribute("xpath").replace(/,$/gi,"")+"]";
 
 
@@ -489,6 +494,7 @@ function  submitContent(id)
 
             if(imglist[i].nextElementSibling.name.toString()=="markon") {
                 jsonstring += "{\"xpath\":\"" + imglist[i].name.replace(/\"/g, "'") + "\",\"src\":\"" + imglist[i].src + "\"},";
+                clickactiontargetxpathlist[imglist[i].name]=false;
             }
 
         }
@@ -555,7 +561,7 @@ function  submitContent(id)
             document.getElementById("swuploadat").style.display="";
             document.getElementById("swuploadat").innerText="LOADING";
             var collectionName=document.getElementById("swinput1").value;
-            chrome.runtime.sendMessage({getState:"submit",data:sendstring,imgData:imgUrlList,url:window.location.href,tacitcn:collectionName,hasspider:"false",clickactiondata:clickactionlist},function(response)
+            chrome.runtime.sendMessage({getState:"submit",data:sendstring,imgData:imgUrlList,url:window.location.href,tacitcn:collectionName,hasspider:"false",clickactiondata:clickactionlist,imgxpaths:clickactiontargetxpathlist},function(response)
             {
                 if(response.code.toString()=="200")
                 {
@@ -587,15 +593,8 @@ function  sendHasSpiderDataToserver(datastr)
         {
             //alert("添加成功");
             clearALLContent();
-
-
         }
-
     });
-
-
-
-
 }
 
 
@@ -622,7 +621,7 @@ function clearALLContent()
         }
     }
 
-    var textarea=document.getElementById("swdestextarea");
+     var textarea=document.getElementById("swdestextarea");
       textarea.value="";
       textarea.setAttribute("xpath","[");
 
@@ -632,7 +631,6 @@ function clearALLContent()
     //rootDIV.style.height="350px";
     // imgDiv.parentNode.removeChild(imgDiv);
     var imglist=imgDiv.getElementsByTagName("img");
-    allimgJsonArray={};
     if(imglist.length>0) {
         for (var i = imglist.length - 1; i >= 0; i--) {
 
@@ -678,23 +676,25 @@ chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
     if(request.state=="true")
     {
         ShowInputWindow(true);
-        document.getElementById("swinput1").value=request.tacitcn;
+        if(request.tacitcn!=null) {
+            document.getElementById("swinput1").value = request.tacitcn;
+        }
 
 
     }
     else if(request.state=="false")
     {
         ShowInputWindow(false);
-        document.getElementById("swinput1").value=request.tacitcn;
+        if(request.tacitcn!=null) {
+            document.getElementById("swinput1").value = request.tacitcn;
+        }
     }
-
-
 
 
     if(request.uploadstate!=null)
     {
-        document.getElementById("swuploadat").style.display="none";
-        document.getElementById("swuploadat").innerText="LOADING";
+        document.getElementById("swuploadat").style.display="";
+        document.getElementById("swuploadat").innerText=currentMD5;
 
         if(request.uploadstate="true")
         {
@@ -716,7 +716,7 @@ chrome.extension.onMessage.addListener(function (request,sender,sendResponse) {
 }
 );
 
-chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname},function(response)
+chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname,href:window.location.href},function(response)
 {
      if(response.state)
      {
@@ -731,15 +731,75 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname},fu
      }
      if(response.clickactiondata.length>0)
      {
-         for(var i=0;i<response.clickactiondata.length>0;i++)
-         {
-                var element=getNodesByxpath(response.clickactiondata[i],document)[0];
-               element.click();
+         console.log("-----clickaction----"+response.clickactiondata+"-----clickaction----");
 
+         var jsrunstr='function getImgList(){ var dispatchMouseEvent =function(target, var_args) {'
+             +'var e = document.createEvent("MouseEvents");'
+             +'e.initEvent.apply(e, Array.prototype.slice.call(arguments,1));'
+             +'target.dispatchEvent(e);}; var imgResultList=[];var avoidRepeatImg={};';
+         var imgxpathlist=response.clickactiontargetxpathlist;
+         jsrunstr+='var imgxpathlist='+JSON.stringify(imgxpathlist)+';';
+         jsrunstr+='var clickactiondata='+JSON.stringify(response.clickactiondata)+';';
+         jsrunstr+='for(var i=0;i<clickactiondata.length;i++){';
+         jsrunstr+=' var elementStr=$x(\'\'+clickactiondata[i]+\'\')[0];';
+         jsrunstr+='if(elementStr==null){continue;}'
+         jsrunstr+='dispatchMouseEvent(elementStr, \'mouseover\', true, true);';
+         jsrunstr+='dispatchMouseEvent(elementStr, \'mousedown\', true, true);';
+         jsrunstr+='dispatchMouseEvent(elementStr, \'click\', true, true);';
+         jsrunstr+='dispatchMouseEvent(elementStr, \'mouseup\', true, true);';
+
+         jsrunstr+='for( key  in imgxpathlist)'
+             +'{'
+             +'var targetImg=getNodesByxpath(""+key+"")[0];'
+             +'if(targetImg!=null){'
+             +'console.log("成功:图片的src=" + targetImg.src);'
+             +'if(!avoidRepeatImg[targetImg.src])'
+             +'{imgResultList.push(targetImg.src);avoidRepeatImg[targetImg.src]=true;  }'
+             +'}'
+             +'else'
+             +' {'
+             +'   console.log(\"失败:\"+targetImg);'
+             +'  }'
+             +'}'
+         +'}';
+
+         for(var i=0;i<response.clickactiondata.length;i++) {
+
+             var element = getNodesByxpath('' + response.clickactiondata[i] + '', document)[0];
+             if (element != null) {
+
+
+
+                 var dispatchMouseEvent = function(target, var_args) {
+                     var e = document.createEvent("MouseEvents");
+                     e.initEvent.apply(e, Array.prototype.slice.call(arguments, 1));
+                     target.dispatchEvent(e);
+                 };
+                 dispatchMouseEvent(element, 'mouseover', true, true);
+                 dispatchMouseEvent(element, 'mousedown', true, true);
+                 dispatchMouseEvent(element, 'click', true, true);
+                 dispatchMouseEvent(element, 'mouseup', true, true);
+                 var numsort=0;
+                 for( key  in imgxpathlist)
+                 {
+                     numsort++;
+                     console.log('正在获取第'+numsort+'张图片,xpath:'+key);
+                    var targetImg=getNodesByxpath(''+key+'')[0];
+                     if(targetImg!=null) {
+                         console.log("成功:图片的src=" + targetImg.src);
+                     }
+                     else
+                     {
+                          console.log("失败:"+targetImg);
+                     }
+
+                 }
+
+               //console.log('$x(\''+response.clickactiondata[i]+'\')[0].dispatchEvent(new Event("mouse"))');
+             }
          }
-
-
-
+          jsrunstr+=' return  imgResultList ;}';
+         console.log("___________模拟点击 \n"+jsrunstr);
      }
 
     //
@@ -752,6 +812,9 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname},fu
     }
     else
     {
+        document.getElementById("swuploadat").innerText=response.md5;
+        currentMD5=response.md5;
+        document.getElementById("swuploadat").style.display="";
         isspecialURL=false;
 
     }
@@ -844,6 +907,10 @@ function  analyseImgElemente(e)
          if(submitbt!=null) {
              suspensionWindow.insertBefore(imgDiv, submitbt.previousElementSibling);
          }
+         else
+         {
+             return false;
+         }
      }
      var  ppnode=getNodeWhoseChildsAreMore(e);
      var imgListSet=ppnode.getElementsByTagName("img");
@@ -855,9 +922,7 @@ function  analyseImgElemente(e)
      var imgList=sortImglist(avoidRepetitionImg(imgListSet));
 
     //当前可选图片的数组
-   //  var displayImgList=imgDiv.getElementsByTagName("img");
-
-
+     var displayImgList=imgDiv.getElementsByTagName("img");
 
     for(var i=0;i<imgList.length;i++)
     {
@@ -887,52 +952,43 @@ function  analyseImgElemente(e)
         img.src=imgList[i].src;
         img.name=getPathTo(imgList[i]);
 
-        //当前可选图片的数组
-        var displayImgList=imgDiv.getElementsByTagName("img");
+        for(var b=0;b<displayImgList.length;b++)
+        {
+            if(displayImgList[b].nextElementSibling.name=="markon")
+            {
+                if(b=displayImgList.length)
+                {
+                    imgDiv.appendChild(img_c);
+                }
+                continue;
+            }
+            var a=parseFloat(img.getAttribute("area"));
+            var d=parseFloat(displayImgList[b].getAttribute("area"));
+            if(a>=d)
+            {
 
+                imgDiv.insertBefore(img_c,displayImgList[b].parentNode);
+                break;
+            }
+            else {
+                imgDiv.appendChild(img_c);
+
+            }
+
+        }
         if(displayImgList.length==0)
         {
             imgDiv.appendChild(img_c);
         }
-        else
-        {
-            for(var b=0;b<displayImgList.length;b++)
-            {
-                //if(displayImgList[b].nextElementSibling.name=="markon")
-                //{
-                //    if(b==(displayImgList.length-1))
-                //    {
-                //        imgDiv.appendChild(img_c);
-                //        break;
-                //
-                //    }
-                //    continue;
-                //
-                //}
-                var a=parseFloat(img.getAttribute("area"));
-                var d=parseFloat(displayImgList[b].getAttribute("area"));
-                if(a>=d&&displayImgList[b].nextElementSibling.name!="markon")
-                {
-
-                    imgDiv.insertBefore(img_c,displayImgList[b].parentNode);
-                    break;
-                }
-                if(b==displayImgList.length-1){
-                    imgDiv.appendChild(img_c);
-                }
-
-            }
 
 
-        }
-
-
-        //  imgDiv.appendChild(img_c);
+      //  imgDiv.appendChild(img_c);
         img.addEventListener("click",clearSingleImg,false);
         img_des.addEventListener("click",changeImgMarkState,false)
     }
 
    return true;
+
 
 }
 
@@ -1034,7 +1090,7 @@ function getPathTo(element) {
     {
         return "";
     }
-    if (element.id!=='')
+    if (element.id!='')
         return 'id("'+element.id+'")';
     if (element===document.body)
         return element.tagName;
@@ -1188,6 +1244,7 @@ function  analyseDomChange(mutations)
          if(mutationRecord.addedNodes!=null&&mutationRecord.type=="childList")
          {
              var nodelist=mutationRecord.addedNodes;
+              var onceDo=true;
              if(nodelist.length>0) {
                  for(var b=0;b<nodelist.length;b++) {
 
@@ -1196,9 +1253,14 @@ function  analyseDomChange(mutations)
                      //    return;
                      //}
                     result= analyseImgElemente(nodelist[b]);
-                     if(result)
+                     if(result&&onceDo)
                      {
-                         clickactionlist.push(getPathTo(currentElement));
+                         var xpath=getPathTo(currentElement);
+                         if(xpath!="") {
+                             clickactionlist.push(xpath);
+                             currentElement=null;
+                             onceDo = false;
+                         }
                      }
                  }
              }
@@ -1214,9 +1276,14 @@ function  analyseDomChange(mutations)
                  else
                  {
 
-                     clickactionlist.push(getPathTo(currentElement));
+                     var xpath=getPathTo(currentElement);
+                     if(xpath!="") {
+                         clickactionlist.push(xpath);
+                         onceDo = false;
+                         currentElement=null;
+                     }
 
-                     currentElement=null;
+
                      analyseImgElemente(mutationRecord.target);
                  }
              }
@@ -1425,4 +1492,68 @@ function  getNodesByxpath(xpath, context)
                 nodes.push(node);
             return nodes;
     }
+}
+
+
+//
+
+function simulateAction(element, eventName)
+{
+    var options = extend(defaultOptions, arguments[2] || {});
+    var oEvent, eventType = null;
+
+    for (var name in eventMatchers)
+    {
+        if (eventMatchers[name].test(eventName)) { eventType = name; break; }
+    }
+
+    if (!eventType)
+        throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
+
+    if (document.createEvent)
+    {
+        oEvent = document.createEvent(eventType);
+        if (eventType == 'HTMLEvents')
+        {
+            oEvent.initEvent(eventName, options.bubbles, options.cancelable);
+        }
+        else
+        {
+            oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
+                options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
+                options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
+        }
+        element.dispatchEvent(oEvent);
+    }
+    else
+    {
+        options.clientX = options.pointerX;
+        options.clientY = options.pointerY;
+        var evt = document.createEventObject();
+        oEvent = extend(evt, options);
+        element.fireEvent('on' + eventName, oEvent);
+    }
+    return element;
+}
+
+function extend(destination, source) {
+    for (var property in source)
+        destination[property] = source[property];
+    return destination;
+}
+
+var eventMatchers = {
+    'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
+    'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
+}
+var defaultOptions = {
+    pointerX: 0,
+    pointerY: 0,
+    button: 0,
+    ctrlKey: false,
+    altKey: false,
+    shiftKey: false,
+    metaKey: false,
+    bubbles: true,
+    cancelable: true
 }
