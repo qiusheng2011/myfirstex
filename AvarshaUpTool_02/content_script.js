@@ -17,7 +17,7 @@ var currentMD5="";
 var currentElement="";
 
 var clickactionlist=[];
-var clickactiontargetxpathlist={};
+var clickactiontargetxpathlist=[];
 
 
 
@@ -494,7 +494,8 @@ function  submitContent(id)
 
             if(imglist[i].nextElementSibling.name.toString()=="markon") {
                 jsonstring += "{\"xpath\":\"" + imglist[i].name.replace(/\"/g, "'") + "\",\"src\":\"" + imglist[i].src + "\"},";
-                clickactiontargetxpathlist[imglist[i].name]=false;
+               // clickactiontargetxpathlist[imglist[i].name]=false;
+                clickactiontargetxpathlist.push(imglist[i].name);
             }
 
         }
@@ -733,7 +734,28 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname,hre
      {
          console.log("-----clickaction----"+response.clickactiondata+"-----clickaction----");
 
-         var jsrunstr='function getImgList(){ var dispatchMouseEvent =function(target, var_args) {'
+          var jsrunstr='function getImgList(){';
+          jsrunstr+='    function  getnode(xpath, context)'
+        +'{'
+              +'    var doc = (context && context.ownerDocument)||document;'
+              +'   var result = doc.evaluate(xpath, context || doc, null, XPathResult.ANY_TYPE, null);'
+              +'   switch (result.resultType) {'
+              +'      case XPathResult.NUMBER_TYPE:'
+              +'      return result.numberValue;'
+              +'  case XPathResult.STRING_TYPE:'
+              +'       return result.stringValue;'
+         +'   case XPathResult.BOOLEAN_TYPE:'
+              +'   return result.booleanValue;'
+         +'   default:'
+         +'      var nodes = [];'
+         +'        var node;'
+         +'        while (node = result.iterateNext())'
+         +'                nodes.push(node);'
+         +'           return nodes;'
+         +'    }'
+         +' }';
+
+          jsrunstr+='var dispatchMouseEvent =function(target, var_args) {'
              +'var e = document.createEvent("MouseEvents");'
              +'e.initEvent.apply(e, Array.prototype.slice.call(arguments,1));'
              +'target.dispatchEvent(e);}; var imgResultList=[];var avoidRepeatImg={};';
@@ -741,16 +763,16 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname,hre
          jsrunstr+='var imgxpathlist='+JSON.stringify(imgxpathlist)+';';
          jsrunstr+='var clickactiondata='+JSON.stringify(response.clickactiondata)+';';
          jsrunstr+='for(var i=0;i<clickactiondata.length;i++){';
-         jsrunstr+=' var elementStr=$x(\'\'+clickactiondata[i]+\'\')[0];';
+         jsrunstr+=' var elementStr=getnode(\'\'+clickactiondata[i]+\'\')[0];';
          jsrunstr+='if(elementStr==null){continue;}'
          jsrunstr+='dispatchMouseEvent(elementStr, \'mouseover\', true, true);';
          jsrunstr+='dispatchMouseEvent(elementStr, \'mousedown\', true, true);';
          jsrunstr+='dispatchMouseEvent(elementStr, \'click\', true, true);';
          jsrunstr+='dispatchMouseEvent(elementStr, \'mouseup\', true, true);';
 
-         jsrunstr+='for( key  in imgxpathlist)'
-             +'{'
-             +'var targetImg=getNodesByxpath(""+key+"")[0];'
+         jsrunstr+='for(var b=0;b<imgxpathlist.length;b++)'
+             +'{ var key=imgxpathlist[b];'
+             +'var targetImg=getnode(""+key+"")[0];'
              +'if(targetImg!=null){'
              +'console.log("成功:图片的src=" + targetImg.src);'
              +'if(!avoidRepeatImg[targetImg.src])'
@@ -762,13 +784,12 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname,hre
              +'  }'
              +'}'
          +'}';
-
+                  var imgresult=[];
+                  var avoidimglist={};
          for(var i=0;i<response.clickactiondata.length;i++) {
 
              var element = getNodesByxpath('' + response.clickactiondata[i] + '', document)[0];
              if (element != null) {
-
-
 
                  var dispatchMouseEvent = function(target, var_args) {
                      var e = document.createEvent("MouseEvents");
@@ -780,26 +801,36 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname,hre
                  dispatchMouseEvent(element, 'click', true, true);
                  dispatchMouseEvent(element, 'mouseup', true, true);
                  var numsort=0;
-                 for( key  in imgxpathlist)
+                 for( var b= 0;b<imgxpathlist.length;b++)
                  {
+
                      numsort++;
-                     console.log('正在获取第'+numsort+'张图片,xpath:'+key);
-                    var targetImg=getNodesByxpath(''+key+'')[0];
+                     console.log('正在获取第'+numsort+'张图片,xpath:'+imgxpathlist[b]);
+                    var targetImg=getNodesByxpath(''+imgxpathlist[b]+'')[0];
                      if(targetImg!=null) {
+
+                         if(!avoidimglist[targetImg.src])
+                         {
+                             imgresult.push(targetImg.src);
+                             avoidimglist[targetImg.src]=true;
+                             analyseImgElemente(targetImg.parentNode);
+                         }
                          console.log("成功:图片的src=" + targetImg.src);
                      }
                      else
                      {
-                          console.log("失败:"+targetImg);
+                         console.log("失败:"+targetImg);
                      }
-
                  }
-
                //console.log('$x(\''+response.clickactiondata[i]+'\')[0].dispatchEvent(new Event("mouse"))');
              }
          }
           jsrunstr+=' return  imgResultList ;}';
          console.log("___________模拟点击 \n"+jsrunstr);
+
+
+         alert("图片有"+imgxpathlist.length+"张,提取了"+ imgresult.length+"张,\n 触发的动作:"+response.clickactiondata.length+"\n content:"+JSON.stringify(response.clickactiondata));
+
      }
 
     //
@@ -812,7 +843,13 @@ chrome.runtime.sendMessage({getState:"state",taburl:window.location.hostname,hre
     }
     else
     {
-        document.getElementById("swuploadat").innerText=response.md5;
+        if(response.md5!=null) {
+            document.getElementById("swuploadat").innerText = response.md5;
+        }
+        else
+        {
+            document.getElementById("swuploadat").innerText ="";
+        }
         currentMD5=response.md5;
         document.getElementById("swuploadat").style.display="";
         isspecialURL=false;
@@ -1545,7 +1582,7 @@ function extend(destination, source) {
 var eventMatchers = {
     'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
     'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
-}
+};
 var defaultOptions = {
     pointerX: 0,
     pointerY: 0,
@@ -1556,4 +1593,5 @@ var defaultOptions = {
     metaKey: false,
     bubbles: true,
     cancelable: true
-}
+};
+

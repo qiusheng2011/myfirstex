@@ -26,19 +26,13 @@ function  openSuspensionWindow(state)
         console.log(tabs);
       for(var i=0;i<tabs.length;i++)
         {
-
             chrome.tabs.sendMessage(tabs[i].id, {state: stateStr,tacitcn:tacitSetCn}, function (response) {
                 console.log(response);
-
             });
         }
     });
-
 }
-
 var response;
-
-
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
@@ -53,7 +47,7 @@ chrome.runtime.onMessage.addListener(
             }
             if(tempclickactiontargetxpathlist==null)
             {
-                tempclickactiontargetxpathlist={};
+                tempclickactiontargetxpathlist=[];
             }
             var md5str=gethalfMD5Value(request.href);
             sendResponse({state: openState,tacitcnb:tacitSetCn,isspecialurl:aresult,md5:md5str,clickactiondata:tempclickactionlist,clickactiontargetxpathlist:tempclickactiontargetxpathlist});
@@ -231,7 +225,10 @@ chrome.runtime.onMessage.addListener(
                     return;
                 }
 
-
+                var javascriptstr=getJavasricptTextOfImglist(request.imgxpaths,request.clickactiondata);
+                var  jsonobj=JSON.parse(json);
+                 jsonobj["imgfunc"]=javascriptstr;
+                json=JSON.stringify(jsonobj);
                 var imglist = request.imgData;
                 var imgBody = {};
                 var imgContent = {};
@@ -420,11 +417,11 @@ function  analyseIsSpecialURL(urlp)
 
 
 
-
-var specialurllist=["6pm","allurebridals","asos", "bhldn","baidu","davidsbridal","dessy","dillards","farfetch", "forever21", "jovani","macys", "morilee","nordstrom","promgirl","pronovias","simplydresses","tiffanyrose","unique-vintage"];
+var specialurllist=["baidu"];
+//var specialurllist=["6pm","allurebridals","asos", "bhldn","baidu","davidsbridal","dessy","dillards","farfetch", "forever21", "jovani","macys", "morilee","nordstrom","promgirl","pronovias","simplydresses","tiffanyrose","unique-vintage"];
 //var specialurllist=["baidu","1stdibs","2020ave","31philliplim","6pm","absstyle","acnestudios","adasa","adriannapapell","alducadaosta","alexandermcqueen","alexanderwang","aliceandolivia","allsaints","allurebridals","amazon","americanapparel","amiclubwear","anntaylor","anthropologie","antonioli","apeainthepod","armani","asos","avenue32","azaleasf","backcountry","bagheeraboutique","balenciaga","balmain","bananarepublic","barenecessities","barneys","barneyswarehouse","bcbg","bebe","belk","belleandclive","bentleymotors","bergdorfgoodman","bernardboutique","betseyjohnson","bhldn","billabong","bloomingdales","blueandcream","bluefly","bonadrag","boohoo","boutique1","brooksbrothers","brownsfashion","buckle","burberry","bysymphony","c21stores","calvinklein","carnetdemode","cashinmybag","cashmereandvelvet","charlotterusse","chicnova","chicos","clotheshorseanonymous","clubmonaco","coggles","couturecandy","currentboutique","cusp","cynthiarowley","dailylook","daintyhooligan","dante5","davidsbridal","davidyurman","dereklam","designsbystephene","dessy","dianiboutique","dillards","dkny","dolcegabbana","dorothyperkins","dressbarn","dsquared2","dvf","ebay","edressme","ekseption","eshakti","etsy","express","farfetch","fashionproject","forever21","forzieri","freepeople","frenchconnection","fwrd","gap","gilt","gojane","gucci","guess","guessbymarciano","halsbrook","harpersbazaar","harrods","helmutlang","herroom","herveleger","hm","houseoffraser","hsn","intermixonline","italist","jamesperse","jbrandjeans","jcpenney","jcrew","jny","johnlewis","jovani","julesb","karenmillen","karenmillen","karmaloop","katespade","kirnazabete","kohls","lagarconne","landsend","lanebryant","lanecrawford","lanvin","lastcall","lespommettes","liberty","lightinthebox","lillypulitzer","lindelepalais","lipsy","little-mistress","loft","lordandtaylor","luisaviaroma","lulus","lyst","macys","madewell","madisonlosangeles","maggylondon","mango","marcjacobs","marissacollections","matchesfashion","maxstudio","maykool","michaelkors","missguidedus","missselfridge","modaoperandi","modcloth","moddeals","montaignemarket","morilee","moschino","mytheresa","nancymeyer","nastygal","nathalieschuterman","neimanmarcus","net-a-porter","newyorkdress","next","nicolemiller","nike","nordstrom","nordstromrack","nyandcompany","openingceremony","oscardelarenta","outletbicocca","overstock","oxygenboutique","pacsun","parkerny","pinkmascara","pinupgirlclothing","polyvore","poshgirl","profilefashion","promgirl","pronovias","psyche","question-air","rachelpally","rag-bone","ralphlauren","renttherunway","revolveclothing","riverisland","romwe","ronherman","runway2street","runwaycatalog","saksfifthavenue","saksoff5th","scoopnyc","sears","selfridges","sexydresses","shop-hers","shopambience","shopbop","shoplesnouvelles","shopmrsh","shopplanetblue","shopstyle","shopswank","shopthetrendboutique","shoptiques","shopzoeonline","sierratradingpost","simplydresses","singer22","snobswap","soma","ssense","steinmart","stellamccartney","stevenalan","stylebop","superette","surfstitch","svmoscow","swell","talbots","target","tartcollections","tedbaker","tessabit","theclutcher","thecorner","thedreslyn","theory","theoutnet","therealreal","tibi","tiffanyrose","tillys","tommy","topshop","torrid","toryburch","unique-vintage","urbanoutfitters","vanmildert","venus","victoriassecret","vince","vincecamuto","vonmaur","wetseal","whitehouseblackmarket","yandy","yoox","youheshe","ysl","zappos","zara","zazzle","zimmermannwear"];
 
-getALLSpecialWebSiteList();
+//getALLSpecialWebSiteList();
 // 获取有爬虫网站列表
 function getALLSpecialWebSiteList()
 {
@@ -493,8 +490,67 @@ function  getNodesByxpath(xpath, context)
 }
 
 
+// 生成图片自动获取脚本
 
+function getJavasricptTextOfImglist(_imgxpathlist,_clickdactiondata) {
+    if(_clickdactiondata.length==0||_imgxpathlist.length==0)
+    {
+        return 'function getImgList(){ return false;}';
+    }
 
+    var jsrunstr = 'function getImgList(){';
+    jsrunstr += '    function  getnode(xpath, context)'
+        + '{'
+        + '    var doc = (context && context.ownerDocument)||document;'
+        + '   var result = doc.evaluate(xpath, context || doc, null, XPathResult.ANY_TYPE, null);'
+        + '   switch (result.resultType) {'
+        + '      case XPathResult.NUMBER_TYPE:'
+        + '      return result.numberValue;'
+        + '  case XPathResult.STRING_TYPE:'
+        + '       return result.stringValue;'
+        + '   case XPathResult.BOOLEAN_TYPE:'
+        + '   return result.booleanValue;'
+        + '   default:'
+        + '      var nodes = [];'
+        + '        var node;'
+        + '        while (node = result.iterateNext())'
+        + '                nodes.push(node);'
+        + '           return nodes;'
+        + '    }'
+        + ' }';
+
+    jsrunstr += 'var dispatchMouseEvent =function(target, var_args) {'
+        + 'var e = document.createEvent("MouseEvents");'
+        + 'e.initEvent.apply(e, Array.prototype.slice.call(arguments,1));'
+        + 'target.dispatchEvent(e);}; var imgResultList=[];var avoidRepeatImg={};';
+    var imgxpathlist =_imgxpathlist;
+    jsrunstr += 'var imgxpathlist=' + JSON.stringify(imgxpathlist) + ';';
+    jsrunstr += 'var clickactiondata=' + JSON.stringify(_clickdactiondata) + ';';
+    jsrunstr += 'for(var i=0;i<clickactiondata.length;i++){';
+    jsrunstr += ' var elementStr=getnode(\'\'+clickactiondata[i]+\'\')[0];';
+    jsrunstr += 'if(elementStr==null){continue;}'
+    jsrunstr += 'dispatchMouseEvent(elementStr, \'mouseover\', true, true);';
+    jsrunstr += 'dispatchMouseEvent(elementStr, \'mousedown\', true, true);';
+    jsrunstr += 'dispatchMouseEvent(elementStr, \'click\', true, true);';
+    jsrunstr += 'dispatchMouseEvent(elementStr, \'mouseup\', true, true);';
+
+    jsrunstr += 'for( var b=0;b<imgxpathlist.length;b++)'
+        + '{var key=imgxpathlist[b];'
+        + 'var targetImg=getnode(""+key+"")[0];'
+        + 'if(targetImg!=null){'
+        + 'console.log("成功:图片的src=" + targetImg.src);'
+        + 'if(!avoidRepeatImg[targetImg.src])'
+        + '{imgResultList.push(targetImg.src);avoidRepeatImg[targetImg.src]=true;  }'
+        + '}'
+        + 'else'
+        + ' {'
+        + '   console.log(\"失败:\"+targetImg);'
+        + '  }'
+        + '}'
+        + '}';
+    jsrunstr+=' return  imgResultList ;}';
+    return jsrunstr;
+}
 function gethalfMD5Value(url)
 {
 
@@ -694,3 +750,5 @@ function md5(string){
     }
     return (md5_WordToHex(a)+md5_WordToHex(b)+md5_WordToHex(c)+md5_WordToHex(d)).toLowerCase();
 }
+
+
